@@ -22,7 +22,7 @@ Creating a more community engages experience where users could interact with eac
 Follow these steps to set up the OlympicPulse project on your local machine:
 
 1. **Download Unity Hub**: Visit [Unity's download page](https://unity.com/download) and install Unity Hub.
-2. **Install Unity Version**: Install Unity version 2022.3.8f1 through Unity Hub.
+2. **Install Unity Version**: Install Unity version 2022.3.8f1 through Unity Hub. Make sure to add iOS build support and Android Build Support plus openJDK.
 3. **Add Build Support Modules**: Ensure to add both Android Build Support and iOS Build Support during installation.
 4. **Install Git LFS**: Before cloning the repository, install [Git LFS](https://git-lfs.com/).
 5. **Optional GitHub Desktop**: Optionally, you can use [GitHub Desktop](https://desktop.github.com/) to clone the repository and manage commits.
