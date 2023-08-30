@@ -1,7 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using ZXing;
+using UnityEngine.SceneManagement;
 
 namespace _OlympicPulse.Scripts
 {
@@ -10,7 +12,7 @@ namespace _OlympicPulse.Scripts
         private WebCamTexture camTexture;
         private Rect screenRect;
 
-        // Ticket infoz
+        // Ticket info
         public string personName;
         public string sport;
         public string date;
@@ -18,11 +20,33 @@ namespace _OlympicPulse.Scripts
 
         void Start()
         {
+            Debug.Log("Starting QR Scanner...");
+
+            // Check if user has already scanned a ticket
+            if (PlayerPrefs.HasKey("HasScannedTicket"))
+            {
+                // User has scanned before. Load the Main scene.
+                try 
+                {
+                    Debug.Log("Attempting to load Main scene due to existing PlayerPrefs.");
+                    SceneManager.LoadScene("Main");
+                } 
+                catch (Exception e) 
+                {
+                    Debug.LogError("An error occurred while loading the scene: " + e.Message);
+                }
+                
+                return;
+            }
+
             // Initialise webcam
             screenRect = new Rect(0, 0, Screen.width, Screen.height);
             camTexture = new WebCamTexture();
-            camTexture.requestedHeight = Screen.height;
-            camTexture.requestedWidth = Screen.width;
+
+            // Specify a lower resolution if needed
+            camTexture.requestedHeight = 480; // lower value
+            camTexture.requestedWidth = 640;  // lower value
+
             if (camTexture != null)
             {
                 camTexture.Play();
@@ -33,7 +57,7 @@ namespace _OlympicPulse.Scripts
         {
             // Draw the camera background for the scanner
             GUI.DrawTexture(screenRect, camTexture, ScaleMode.ScaleToFit);
-            
+
             try
             {
                 IBarcodeReader barcodeReader = new BarcodeReader();
@@ -71,12 +95,49 @@ namespace _OlympicPulse.Scripts
 
                     // Log the parsed information
                     Debug.Log($"Name: {personName}, Sport: {sport}, Date: {date}, Time: {time}");
+
+                    // Stop the camera
+                    if (camTexture != null)
+                    {
+                        camTexture.Stop();
+                    }
+
+                    // Store the information in PlayerPrefs
+                    PlayerPrefs.SetString("PersonName", personName);
+                    PlayerPrefs.SetString("Sport", sport);
+                    PlayerPrefs.SetString("Date", date);
+                    PlayerPrefs.SetString("Time", time);
+                    PlayerPrefs.SetInt("HasScannedTicket", 1); // Set flag to indicate a ticket has been scanned
+                    PlayerPrefs.Save();
+
+                    Debug.Log("Attempting to load Main scene.");
+                    
+                    // Load the next scene with a delay
+                    StartCoroutine(LoadSceneAfterDelay("Main", 1));
                 }
             }
             catch (System.Exception ex)
             {
                 Debug.LogWarning(ex.Message);
             }
+        }
+
+        IEnumerator LoadSceneAfterDelay(string sceneName, float delay)
+        {
+            yield return new WaitForSeconds(delay);
+            try 
+            {
+                SceneManager.LoadScene(sceneName);
+            } 
+            catch (Exception e) 
+            {
+                Debug.LogError("An error occurred while loading the scene: " + e.Message);
+            }
+        }
+
+        void OnApplicationQuit()
+        {
+            Debug.Log("Application ending after " + Time.time + " seconds");
         }
     }
 }

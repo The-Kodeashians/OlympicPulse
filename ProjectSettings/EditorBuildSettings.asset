@@ -5,9 +5,9 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 0
-    path: Assets/ExampleAssets/Scenes/SampleScene.unity
-    guid: 9fc0d4010bbf28b4594072e72b8655ab
+  - enabled: 1
+    path: Assets/_OlympicPulse/Scenes/TicketScan.unity
+    guid: 1b872d4c215ac4ef58dcd34e54c938fd
   - enabled: 1
     path: Assets/_OlympicPulse/Scenes/Main.unity
     guid: 47df0f09fcd32194bb5d5d200684e13e
