@@ -9,8 +9,8 @@ namespace _OlympicPulse.Scripts
 {
     public class OP_QR_SCAN : MonoBehaviour
     {
-        private WebCamTexture camTexture;
-        private Rect screenRect;
+        private WebCamTexture _camTexture;
+        private Rect _screenRect;
 
         // Ticket info
         public string personName;
@@ -20,6 +20,11 @@ namespace _OlympicPulse.Scripts
 
         void Start()
         {
+            // Lock the screen in portrait orientation
+            Screen.orientation = ScreenOrientation.Portrait;
+            
+            _screenRect = new Rect(0, 0, Screen.width, Screen.height);
+
             Debug.Log("Starting QR Scanner...");
 
             // Check if user has already scanned a ticket
@@ -39,30 +44,86 @@ namespace _OlympicPulse.Scripts
                 return;
             }
 
-            // Initialise webcam
-            screenRect = new Rect(0, 0, Screen.width, Screen.height);
-            camTexture = new WebCamTexture();
-
-            // Specify a lower resolution if needed
-            camTexture.requestedHeight = 480; // lower value
-            camTexture.requestedWidth = 640;  // lower value
-
-            if (camTexture != null)
+            // Check for camera permission
+            if (Application.HasUserAuthorization(UserAuthorization.WebCam))
             {
-                camTexture.Play();
+                InitializeWebCam();
+            }
+            else
+            {
+                StartCoroutine(RequestCameraPermission());
+            }
+        }
+
+        void InitializeWebCam()
+        {
+            // Initialise webcam
+            _camTexture = new WebCamTexture();
+            _camTexture.requestedHeight = 480; // lower value
+            _camTexture.requestedWidth = 640;  // lower value
+
+            if (_camTexture != null)
+            {
+                _camTexture.Play();
+            }
+        }
+
+        IEnumerator RequestCameraPermission()
+        {
+            yield return Application.RequestUserAuthorization(UserAuthorization.WebCam);
+            if (Application.HasUserAuthorization(UserAuthorization.WebCam))
+            {
+                InitializeWebCam();
+            }
+            else
+            {
+                Debug.LogWarning("User did not grant camera permission.");
             }
         }
 
         void OnGUI()
         {
+            if (_camTexture == null)
+            {
+                Debug.LogError("Camera texture is null.");
+                return;
+            }
+
+            if (!_camTexture.isPlaying)
+            {
+                Debug.LogError("Camera texture is not playing.");
+                return;
+            }
+    
+            // Calculate aspect ratio scaling
+            float videoRatio = (float)_camTexture.width / (float)_camTexture.height;
+    
+            // Calculate the position to start drawing the texture so that it's centered
+            float startX = (Screen.width - (_screenRect.height * videoRatio)) / 2;
+            Rect scaledRect = new Rect(startX, 0, _screenRect.height * videoRatio, _screenRect.height);
+            
+            int rotate = 270;
+            
+            // Flip the x-axis to mirror the texture
+            GUIUtility.ScaleAroundPivot(new Vector2(-1, 1), new Vector2(_screenRect.width * 0.5f, _screenRect.height * 0.5f));
+
+            // Rotate the texture
+            GUIUtility.RotateAroundPivot(rotate, new Vector2(_screenRect.width * 0.5f, _screenRect.height * 0.5f));
+
             // Draw the camera background for the scanner
-            GUI.DrawTexture(screenRect, camTexture, ScaleMode.ScaleToFit);
+            GUI.DrawTexture(scaledRect, _camTexture, ScaleMode.ScaleAndCrop);
+
+            // Revert the rotation to not affect other GUI elements
+            GUIUtility.RotateAroundPivot(-rotate, new Vector2(_screenRect.width * 0.5f, _screenRect.height * 0.5f));
+
+            // Revert the x-axis scale to not affect other GUI elements
+            GUIUtility.ScaleAroundPivot(new Vector2(-1, 1), new Vector2(_screenRect.width * 0.5f, _screenRect.height * 0.5f));
 
             try
             {
                 IBarcodeReader barcodeReader = new BarcodeReader();
                 // Decode the current frame
-                var result = barcodeReader.Decode(camTexture.GetPixels32(), camTexture.width, camTexture.height);
+                var result = barcodeReader.Decode(_camTexture.GetPixels32(), _camTexture.width, _camTexture.height);
                 if (result != null)
                 {
                     Debug.Log("DECODED TEXT FROM QR: " + result.Text);
@@ -97,9 +158,9 @@ namespace _OlympicPulse.Scripts
                     Debug.Log($"Name: {personName}, Sport: {sport}, Date: {date}, Time: {time}");
 
                     // Stop the camera
-                    if (camTexture != null)
+                    if (_camTexture != null)
                     {
-                        camTexture.Stop();
+                        _camTexture.Stop();
                     }
 
                     // Store the information in PlayerPrefs
@@ -111,12 +172,12 @@ namespace _OlympicPulse.Scripts
                     PlayerPrefs.Save();
 
                     Debug.Log("Attempting to load Main scene.");
-                    
+
                     // Load the next scene with a delay
                     StartCoroutine(LoadSceneAfterDelay("Main", 1));
                 }
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 Debug.LogWarning(ex.Message);
             }
@@ -133,11 +194,6 @@ namespace _OlympicPulse.Scripts
             {
                 Debug.LogError("An error occurred while loading the scene: " + e.Message);
             }
-        }
-
-        void OnApplicationQuit()
-        {
-            Debug.Log("Application ending after " + Time.time + " seconds");
         }
     }
 }
