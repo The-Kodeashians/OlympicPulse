@@ -45,5 +45,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   arPlaneManager: {fileID: 0}
-  objectToPlace: {fileID: 919132149155446097, guid: de4da3906a001624fabcc7838ddf2eb4,
-    type: 3}
+  objectToPlace: {fileID: 100000, guid: 00b78b03851cb0748b61d9005fb73b49, type: 3}

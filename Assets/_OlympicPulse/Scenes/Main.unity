@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.4465788, g: 0.49641287, b: 0.5748173, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657874, g: 0.49641275, b: 0.5748171, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -950,6 +950,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: InteractiveMap
       objectReference: {fileID: 0}
+    - target: {fileID: 4338835180951002340, guid: b3d01b2ed08074b20ad5b35740573fb9,
+        type: 3}
+      propertyPath: objectToPlace
+      value: 
+      objectReference: {fileID: 100000, guid: 00b78b03851cb0748b61d9005fb73b49, type: 3}
     - target: {fileID: 4338835180951002340, guid: b3d01b2ed08074b20ad5b35740573fb9,
         type: 3}
       propertyPath: arPlaneManager
