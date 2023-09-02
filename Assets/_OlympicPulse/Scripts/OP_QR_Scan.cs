@@ -27,23 +27,6 @@ namespace _OlympicPulse.Scripts
 
             Debug.Log("Starting QR Scanner...");
 
-            // Check if user has already scanned a ticket
-            if (PlayerPrefs.HasKey("HasScannedTicket"))
-            {
-                // User has scanned before. Load the Main scene.
-                try 
-                {
-                    Debug.Log("Attempting to load Main scene due to existing PlayerPrefs.");
-                    SceneManager.LoadScene("Main");
-                } 
-                catch (Exception e) 
-                {
-                    Debug.LogError("An error occurred while loading the scene: " + e.Message);
-                }
-                
-                return;
-            }
-
             // Check for camera permission
             if (Application.HasUserAuthorization(UserAuthorization.WebCam))
             {
@@ -171,10 +154,10 @@ namespace _OlympicPulse.Scripts
                     PlayerPrefs.SetInt("HasScannedTicket", 1); // Set flag to indicate a ticket has been scanned
                     PlayerPrefs.Save();
 
-                    Debug.Log("Attempting to load Main scene.");
+                    Debug.Log("Attempting to load PersnalisedWelcome scene.");
 
                     // Load the next scene with a delay
-                    StartCoroutine(LoadSceneAfterDelay("Main", 1));
+                    StartCoroutine(LoadSceneAfterDelay("PersonalisedWelcome", 1));
                 }
             }
             catch (Exception ex)
