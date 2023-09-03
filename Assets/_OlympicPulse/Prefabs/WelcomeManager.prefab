@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &8217346562222693820
+--- !u!1 &7755432717171507300
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,43 +8,42 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 7803126266875820380}
-  - component: {fileID: 547916916370540730}
+  - component: {fileID: 472192323762041503}
+  - component: {fileID: 5110121525900133549}
   m_Layer: 0
-  m_Name: Ticket Scanner
+  m_Name: WelcomeManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &7803126266875820380
+--- !u!4 &472192323762041503
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8217346562222693820}
+  m_GameObject: {fileID: 7755432717171507300}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.2771464, y: -0.084353685, z: 0.33619374}
+  m_LocalPosition: {x: 724.47845, y: 424.5, z: 1.5215564}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &547916916370540730
+--- !u!114 &5110121525900133549
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8217346562222693820}
+  m_GameObject: {fileID: 7755432717171507300}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 84771d5a2cb4846469ce8d710e3c1c00, type: 3}
+  m_Script: {fileID: 11500000, guid: 9754c8ccf92cd4418b5dfc58c7ebfbbf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  personName: 
-  sport: 
-  date: 
-  time: 
+  welcomeText: {fileID: 0}
+  countdownText: {fileID: 0}
+  fadeTime: 2

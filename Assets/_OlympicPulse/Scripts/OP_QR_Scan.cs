@@ -115,24 +115,29 @@ namespace _OlympicPulse.Scripts
                     string[] pairs = result.Text.Split(',');
                     foreach (string pair in pairs)
                     {
-                        string[] keyValue = pair.Split(':');
-                        if (keyValue.Length == 2)
+                        int index = pair.IndexOf(':');
+                        if (index > 0)
                         {
-                            if (keyValue[0].Equals("Name"))
+                            string key = pair.Substring(0, index);
+                            string value = pair.Substring(index + 1);
+
+                            Debug.Log($"Key: '{key}', Value: '{value}'");
+
+                            if (key.Equals("Name"))
                             {
-                                personName = keyValue[1];
+                                personName = value;
                             }
-                            else if (keyValue[0].Equals("Sport"))
+                            else if (key.Equals("Sport"))
                             {
-                                sport = keyValue[1];
+                                sport = value;
                             }
-                            else if (keyValue[0].Equals("Date"))
+                            else if (key.Equals("Date"))
                             {
-                                date = keyValue[1];
+                                date = value;
                             }
-                            else if (keyValue[0].Equals("Time"))
+                            else if (key.Equals("Time"))
                             {
-                                time = keyValue[1];
+                                time = value;
                             }
                         }
                     }
