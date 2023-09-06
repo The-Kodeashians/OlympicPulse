@@ -11,6 +11,8 @@ namespace _OlympicPulse.Scripts
         public TextMeshProUGUI welcomeText;
         public TextMeshProUGUI countdownText;
         public float fadeTime = 2f;
+        private Vector2 touchStartPos, touchEndPos;
+        private bool swipedUp = false;
 
         private DateTime _eventDateTime;
 
@@ -38,13 +40,39 @@ namespace _OlympicPulse.Scripts
 
                 // Start countdown coroutine
                 StartCoroutine(CountdownToEvent());
-
-                // Start fade to Main scene after 4 seconds
-                StartCoroutine(FadeToMainSceneAfterDelay(4));
             }
             catch (Exception e)
             {
                 Debug.LogError($"An error occurred: {e.Message}");
+            }
+        }
+        
+        void Update()
+        {
+            // Swipe-up detection
+            if (Input.touchCount > 0)
+            {
+                Touch touch = Input.GetTouch(0);
+
+                switch (touch.phase)
+                {
+                    case TouchPhase.Began:
+                        touchStartPos = touch.position;
+                        break;
+                    case TouchPhase.Ended:
+                        touchEndPos = touch.position;
+                        if (touchEndPos.y - touchStartPos.y > 100) // Swipe sensitivity
+                        {
+                            swipedUp = true;
+                        }
+
+                        break;
+                }
+            }
+
+            if (swipedUp)
+            {
+                LoadScene("Main");
             }
         }
 
@@ -64,7 +92,6 @@ namespace _OlympicPulse.Scripts
                 yield return new WaitForSeconds(1);
             }
         }
-        
         
         IEnumerator FadeToMainSceneAfterDelay(float delay)
         {
@@ -94,7 +121,19 @@ namespace _OlympicPulse.Scripts
 
             // Load the Main scene
             Debug.Log("Loading Main scene.");
-            SceneManager.LoadScene("Main");
+            LoadScene("Main");
+        }
+        void LoadScene(string sceneName)
+        {
+            try
+            {
+                Debug.Log($"Attempting to load {sceneName} scene.");
+                SceneManager.LoadScene(sceneName);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("An error occurred while loading the scene: " + e.Message);
+            }
         }
     }
 }
