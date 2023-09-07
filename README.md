@@ -1,20 +1,28 @@
 # OlympicPulse
-An AR app for mobile that provides Olympic ticket holders with an interactive and informative experience.
+An AR app for mobile targeting amateur athletes visiting the Olympics, offering an immersive experience with the stadium and world-record holders.
 
 ## Project Overview
 
 ### Objective
-The OlympicPulse project aims to create an immersive onboarding experience for Olympic event attendees. By leveraging Augmented Reality (AR) technology, the app enhances user interaction and offers a seamless and engaging journey from ticket purchase to event participation.
+OlympicPulse aims to provide an unforgettable experience for Olympic ticket holders, especially amateur athletes. The app leverages Augmented Reality (AR) to show a 3D representation of the stadium and an AR sprinting game where users can witness world record holders (from various decades) run side by side with them. Users can either hold the phone themselves to view a 3D representation of the athlete running alongside them, or they can have a friend record the experience for later viewing.
 
 ### Key Features
 Through a blend of interactive content and real-time engagement, OlympicPulse builds anticipation and excitement leading up to the event.
 
 - **AR Interactive Map**: Upon scanning their ticket, users receive an AR interactive map of the stadium, providing valuable insights, directions, and information.
-- **Reward Scanning**: Users can scan specific codes around the stadium to unlock rewards and special content.
-- **Activities**: Engagment through quizzes and other AR related mini games related to the Olympics.
+- **AR Sprinting Game**: Users can race alongside world record holders from different decades and experience their incredible speeds firsthand.
+- **User Interaction**: Depending on the scenario, users can either hold the phone for a personal experience or have someone else record their race for a third-person perspective..
 
-### Future Scope
-Creating a more community engages experience where users could interact with each other through the App and compare their scanned collections.
+
+Scenes Description
+
+All scenes relevant to the app are located in /Assets/_OlympicPulse/Scenes.
+
+- **Intro**: Features the 'IntroManager' prefab with the OP_Intro_Script. Acts as the splash screen on app startup. Directs users either to the 'TicketScan' scene (for first-time users) or the 'Main' scene (for returning users).
+- **TicketScan**: Holds the 'TicketScanner' prefab with the OP_QR_Scan script. After obtaining camera permissions, it scans for a QR code, stores the relevant information, and transitions to the 'PersonalisedWelcome' scene.
+- **PersonalisedWelcome**: Contains the 'WelcomeManager' prefab. Displays the information scanned from the ticket and a countdown to the event. On swiping up, it redirects users to the 'Main' scene.
+- **Main**: Contains the AR functionalities. Upon detecting planes, the 'InteractiveMap' prefab with its attached script allows users to place or remove the 3D object onto the detected plane by tapping the screen.
+- TODO: **SprintGame**: The AR sprinting game.
 
 
 ## Project Setup
