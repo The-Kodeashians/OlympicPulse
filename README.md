@@ -14,7 +14,7 @@ Through a blend of interactive content and real-time engagement, OlympicPulse bu
 - **User Interaction**: Depending on the scenario, users can either hold the phone for a personal experience or have someone else record their race for a third-person perspective..
 
 
-Scenes Description
+### Scenes Description
 
 All scenes relevant to the app are located in /Assets/_OlympicPulse/Scenes.
 
