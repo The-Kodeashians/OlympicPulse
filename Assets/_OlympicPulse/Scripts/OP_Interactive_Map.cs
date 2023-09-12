@@ -2,61 +2,128 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR.ARFoundation;
+using UnityEngine.UI;
+using TMPro;
 
-public class OP_Interactive_Map : MonoBehaviour
-{
-    public ARPlaneManager arPlaneManager;
-    public GameObject objectToPlace;
-
-    private GameObject currentObjectInstance; // This will store our instantiated object
-
-    void Update()
+namespace _OlympicPulse.Scripts
+{ 
+    public class OP_Interactive_Map : MonoBehaviour
     {
-        // Check for screen touches
-        if (Input.touchCount > 0 && Input.touches[0].phase == TouchPhase.Began)
+        public ARPlaneManager arPlaneManager;
+        public GameObject objectToPlace;
+        public Button placeMapButton; // Reference to the button
+        public TextMeshProUGUI buttonText; // Reference to the button's text component
+
+        private GameObject _currentObjectInstance; // This will store our instantiated object
+
+        private Vector2
+            _previousTouchDifference; // Stores the difference between two touch points from the previous frame
+
+        private float _previousTouchDistance; // Stores distance between two touch points from the previous frame
+
+        void Start()
         {
-            ToggleMap();
+            // Initially, set the button as invisible
+            placeMapButton.gameObject.SetActive(false);
+
+            // Add a listener for the button click event
+            placeMapButton.onClick.AddListener(ToggleMap);
         }
-    }
 
-    void ToggleMap()
-    {
-        // If the map is not instantiated, instantiate it
-        if (currentObjectInstance == null)
+        void Update()
         {
-            List<ARPlane> allPlanes = new List<ARPlane>();
-            foreach (var plane in arPlaneManager.trackables)
+            // Pinch to scale
+            if (Input.touchCount == 2)
             {
-                allPlanes.Add(plane);
+                // Get current touch positions
+                Touch touchZero = Input.touches[0];
+                Touch touchOne = Input.touches[1];
+
+                // Calculate touch difference for current and previous frame
+                Vector2 touchZeroPrevPos = touchZero.position - touchZero.deltaPosition;
+                Vector2 touchOnePrevPos = touchOne.position - touchOne.deltaPosition;
+                float prevTouchDeltaMag = (touchZeroPrevPos - touchOnePrevPos).magnitude;
+                float touchDeltaMag = (touchZero.position - touchOne.position).magnitude;
+                float deltaMagnitudeDiff = prevTouchDeltaMag - touchDeltaMag;
+
+                if (_currentObjectInstance != null)
+                {
+                    // Scale the object based on the pinch gesture
+                    float pinchAmount = deltaMagnitudeDiff * 0.02f; // Scale factor
+                    Vector3 newScale = _currentObjectInstance.transform.localScale -
+                                       new Vector3(pinchAmount, pinchAmount, pinchAmount);
+                    // Ensure the object doesn't become too small or too large
+                    newScale = new Vector3(Mathf.Clamp(newScale.x, 0.1f, 5f), Mathf.Clamp(newScale.y, 0.1f, 5f),
+                        Mathf.Clamp(newScale.z, 0.1f, 5f));
+                    _currentObjectInstance.transform.localScale = newScale;
+                }
+            }
+        }
+
+        public void ToggleMap()
+        {
+            Debug.Log("ToggleMap was called!");
+
+            if (_currentObjectInstance == null)
+            {
+                List<ARPlane> allPlanes = new List<ARPlane>();
+                foreach (var plane in arPlaneManager.trackables)
+                {
+                    allPlanes.Add(plane);
+                }
+
+                if (allPlanes.Count > 0)
+                {
+                    Vector3 instantiatePosition = allPlanes[0].center + new Vector3(0, objectToPlace.transform.localScale.y / 2, 0);
+                    _currentObjectInstance = Instantiate(objectToPlace, instantiatePosition, Quaternion.identity);
+            
+                    Debug.Log($"Object instantiated at {_currentObjectInstance.transform.position} with scale {_currentObjectInstance.transform.localScale}");
+                }
+                else
+                {
+                    Debug.Log("No AR planes detected.");
+                }
+            }
+            else
+            {
+                Debug.Log($"Destroying object at {_currentObjectInstance.transform.position}");
+                Destroy(_currentObjectInstance);
+                _currentObjectInstance = null;
             }
 
-            if (allPlanes.Count > 0) 
+            buttonText.text = _currentObjectInstance == null ? "Place Map" : "Remove Map";
+        }
+        
+        void OnPlaneAdded(ARPlanesChangedEventArgs args)
+        {
+            // If a plane is added, make the button visible
+            if (args.added != null && args.added.Count > 0)
             {
-                currentObjectInstance = Instantiate(objectToPlace, allPlanes[0].center, Quaternion.identity);
+                placeMapButton.gameObject.SetActive(true);
             }
         }
-        // If the map is already instantiated, destroy it
-        else
+
+        void OnPlaneRemoved(ARPlanesChangedEventArgs args)
         {
-            Destroy(currentObjectInstance);
-            currentObjectInstance = null;
+            // If all planes are removed, make the button invisible
+            if (arPlaneManager.trackables.count == 0)
+            {
+                placeMapButton.gameObject.SetActive(false);
+            }
         }
-    }
 
-    void OnPlaneAdded(ARPlanesChangedEventArgs args)
-    {
-        // We won't automatically instantiate the object here anymore
-    }
+        void OnEnable()
+        {
+            // Subscribe to the planesChanged event
+            arPlaneManager.planesChanged += OnPlaneAdded;
+            arPlaneManager.planesChanged += OnPlaneRemoved;
+        }
 
-    void OnEnable()
-    {
-        // Subscribe to the planeAdded event
-        arPlaneManager.planesChanged += OnPlaneAdded;
-    }
-
-    void OnDisable()
-    {
-        // Unsubscribe from the planeAdded event
-        arPlaneManager.planesChanged -= OnPlaneAdded;
+        void OnDisable()
+        {
+            // Unsubscribe from the planesChanged event
+            arPlaneManager.planesChanged -= OnPlaneAdded;
+            arPlaneManager.planesChanged -= OnPlaneRemoved;
+        }
     }
 }
