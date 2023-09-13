@@ -852,7 +852,13 @@ PlayerSettings:
   XboxOneOverrideIdentityName: 
   XboxOneOverrideIdentityPublisher: 
   vrEditorSettings: {}
-  cloudServicesEnabled: {}
+  cloudServicesEnabled:
+    Build: 0
+    Game Performance: 0
+    Legacy Analytics: 0
+    Purchasing: 0
+    UDP: 0
+    Unity Ads: 0
   luminIcon:
     m_Name: 
     m_ModelFolderPath: 
@@ -872,11 +878,11 @@ PlayerSettings:
   apiCompatibilityLevel: 6
   activeInputHandler: 2
   windowsGamepadBackendHint: 0
-  cloudProjectId: 1e8a1021-581b-43d6-a87a-9b2d91041b56
+  cloudProjectId: c42d5f71-1b40-4cb3-bd00-98de88f0bfe0
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
   projectName: OlympicPulse
-  organizationId: jbhewitt
+  organizationId: ewyj01
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 0
   hmiLoadingImage: {fileID: 0}
