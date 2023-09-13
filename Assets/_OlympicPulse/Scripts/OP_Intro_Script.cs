@@ -54,6 +54,12 @@ namespace _OlympicPulse.Scripts
                         break;
                 }
             }
+            
+            // Keyboard input for desktop or Mac
+            if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
+            {
+                swipedUp = true;
+            }
 
             if (swipedUp)
             {
