@@ -22,7 +22,7 @@ namespace _OlympicPulse.Scripts
         {
             // Lock the screen in portrait orientation
             Screen.orientation = ScreenOrientation.Portrait;
-            
+
             _screenRect = new Rect(0, 0, Screen.width, Screen.height);
 
             Debug.Log("Starting QR Scanner...");
@@ -43,7 +43,7 @@ namespace _OlympicPulse.Scripts
             // Initialise webcam
             _camTexture = new WebCamTexture();
             _camTexture.requestedHeight = 480; // lower value
-            _camTexture.requestedWidth = 640;  // lower value
+            _camTexture.requestedWidth = 640; // lower value
 
             if (_camTexture != null)
             {
@@ -77,18 +77,19 @@ namespace _OlympicPulse.Scripts
                 Debug.LogError("Camera texture is not playing.");
                 return;
             }
-    
+
             // Calculate aspect ratio scaling
             float videoRatio = (float)_camTexture.width / (float)_camTexture.height;
-    
+
             // Calculate the position to start drawing the texture so that it's centered
             float startX = (Screen.width - (_screenRect.height * videoRatio)) / 2;
             Rect scaledRect = new Rect(startX, 0, _screenRect.height * videoRatio, _screenRect.height);
-            
+
             int rotate = 270;
-            
+
             // Flip the x-axis to mirror the texture
-            GUIUtility.ScaleAroundPivot(new Vector2(-1, 1), new Vector2(_screenRect.width * 0.5f, _screenRect.height * 0.5f));
+            GUIUtility.ScaleAroundPivot(new Vector2(-1, 1),
+                new Vector2(_screenRect.width * 0.5f, _screenRect.height * 0.5f));
 
             // Rotate the texture
             GUIUtility.RotateAroundPivot(rotate, new Vector2(_screenRect.width * 0.5f, _screenRect.height * 0.5f));
@@ -100,7 +101,8 @@ namespace _OlympicPulse.Scripts
             GUIUtility.RotateAroundPivot(-rotate, new Vector2(_screenRect.width * 0.5f, _screenRect.height * 0.5f));
 
             // Revert the x-axis scale to not affect other GUI elements
-            GUIUtility.ScaleAroundPivot(new Vector2(-1, 1), new Vector2(_screenRect.width * 0.5f, _screenRect.height * 0.5f));
+            GUIUtility.ScaleAroundPivot(new Vector2(-1, 1),
+                new Vector2(_screenRect.width * 0.5f, _screenRect.height * 0.5f));
 
             try
             {
@@ -174,11 +176,11 @@ namespace _OlympicPulse.Scripts
         IEnumerator LoadSceneAfterDelay(string sceneName, float delay)
         {
             yield return new WaitForSeconds(delay);
-            try 
+            try
             {
                 SceneManager.LoadScene(sceneName);
-            } 
-            catch (Exception e) 
+            }
+            catch (Exception e)
             {
                 Debug.LogError("An error occurred while loading the scene: " + e.Message);
             }
