@@ -1,31 +1,27 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Serialization;
-
+using UnityEngine.UI;
 
 namespace _OlympicPulse.Scripts.SprintScripts
 {
     public class OP_Sprint_Manager : MonoBehaviour
     {
-        [FormerlySerializedAs("ARSprinter")] public GameObject ARSprinter; // Reference to runners' model
-        public float WorldRecordPace; // Pace of the WR?? TODO: figure out how to keep up on WR pace
+        public GameObject Sprinter; 
+        public float WorldRecordPace; 
         public Transform StartPoint;
         public Transform FinishPoint;
-
-        private enum RaceState
-        {
-            NotStarted,
-            Running,
-            Finished
-        }
+        public Text countdownText; 
 
         private RaceState currentRaceState = RaceState.NotStarted;
         private float raceTimer = 0.0f;
 
         void Start()
         {
-            // Initialization code here if needed
+            if (countdownText)
+            {
+                countdownText.gameObject.SetActive(false);
+            }
         }
 
         void Update()
@@ -40,31 +36,56 @@ namespace _OlympicPulse.Scripts.SprintScripts
 
         public void InitializeRace()
         {
-            // Setu p code for the race
+            StartCoroutine(CountdownAndStartRace());
         }
 
-        public void StartRace()
+        private IEnumerator CountdownAndStartRace()
+        {
+            int countdown = 3;
+            countdownText.gameObject.SetActive(true);
+
+            while (countdown > 0)
+            {
+                countdownText.text = countdown.ToString();
+                yield return new WaitForSeconds(1);
+                countdown--;
+            }
+
+            countdownText.text = "GO!";
+            yield return new WaitForSeconds(1);
+            countdownText.gameObject.SetActive(false);
+
+            StartRace();
+        }
+
+        private void StartRace()
         {
             currentRaceState = RaceState.Running;
-            // Code to start the AR sprinters movement
-            ARSprinter.GetComponent<OP_AR_Sprinter_Script>().StartRunning();
+            Sprinter.GetComponent<OP_Sprinter_Script>().StartRunning();
         }
 
-        void UpdateRunnerPosition()
+        private void UpdateRunnerPosition()
         {
-            // Code to update the position of the AR sprinter based on the world record pace?? not sure
+            float distanceToCover = Vector3.Distance(StartPoint.position, FinishPoint.position);
+            float currentSpeed = WorldRecordPace; // may need work here
+
+            float fractionOfJourney = raceTimer * currentSpeed / distanceToCover;
+            Sprinter.transform.position = Vector3.Lerp(StartPoint.position, FinishPoint.position, fractionOfJourney);
         }
 
-        void CheckRaceCompletion()
+        private void CheckRaceCompletion()
         {
-            // Check if the AR sprinter has reached the finish line
+            if(Vector3.Distance(Sprinter.transform.position, FinishPoint.position) < 0.1f)
+            {
+                EndRace();
+            }
         }
 
-        void EndRace()
+        private void EndRace()
         {
             currentRaceState = RaceState.Finished;
-            ARSprinter.GetComponent<OP_AR_Sprinter_Script>().StopRunning();
-            // Other end race actions
+            Sprinter.GetComponent<OP_Sprinter_Script>().StopRunning();
+            // Any other end race actions
         }
     }
 }

@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace _OlympicPulse.Scripts.SprintScripts
 {
-    public class OP_AR_Sprinter_Script : MonoBehaviour
+    public class OP_Sprinter_Script : MonoBehaviour
     {
         private Actions actions;
 
@@ -16,7 +16,7 @@ namespace _OlympicPulse.Scripts.SprintScripts
             // Check if the Actions component is available
             if (actions == null)
             {
-                Debug.LogError("Actions component not f ound on the GameObject");
+                Debug.LogError("Actions component not found on the GameObject");
             }
         }
 
@@ -24,7 +24,7 @@ namespace _OlympicPulse.Scripts.SprintScripts
         {
             if (actions != null)
             {
-                actions.Run(); // triggers the animation
+                actions.Run(); // triggers the running animation
             }
         }
         
@@ -32,7 +32,7 @@ namespace _OlympicPulse.Scripts.SprintScripts
         {
             if (actions != null)
             {
-                actions.Death(); // triggers the animation
+                actions.Stay(); // triggers the idle animation??
             }
         }
     }
