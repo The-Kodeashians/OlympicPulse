@@ -2,8 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR.ARFoundation;
-using TMPro; // Required for TMPro button
-using UnityEngine.UI; // Required for Unity's button
+using TMPro;
+using UnityEngine.UI;
 
 namespace _OlympicPulse.Scripts.SprintScripts
 {
@@ -85,27 +85,68 @@ namespace _OlympicPulse.Scripts.SprintScripts
                 }
             }
         }
-
+        
         private void OnPlaceSprinterButtonPressed()
         {
+            Debug.Log("OnPlaceSprinterButtonPressed called");
+
+            if (arRaycastManager == null)
+            {
+                Debug.LogError("arRaycastManager is null");
+                return;
+            }
+
             // Raycast from the center of the camera view
             Vector2 screenCenter = new Vector2(Screen.width / 2, Screen.height / 2);
             List<ARRaycastHit> hits = new List<ARRaycastHit>();
-    
+
             if (arRaycastManager.Raycast(screenCenter, hits, UnityEngine.XR.ARSubsystems.TrackableType.PlaneWithinPolygon))
             {
                 Pose hitPose = hits[0].pose;
 
+                // Check for null or uninitialized objects
+                if (SprinterPrefab == null)
+                {
+                    Debug.LogError("SprinterPrefab is null");
+                    return;
+                }
+
+                if (Camera.main == null)
+                {
+                    Debug.LogError("Main Camera is null");
+                    return;
+                }
+
+                // If a sprinter already exists, destroy it
+                if (spawnedSprinter != null)
+                {
+                    Destroy(spawnedSprinter);
+                }
+
                 // Offset to the right of the camera (assuming Y is up)
-                Vector3 spawnPosition = hitPose.position + Camera.main.transform.right;
+                Vector3 spawnPosition = hitPose.position + Camera.main.transform.right * 0.5f; // Offset by 0.5 meters to the right
 
-                // Place the sprinter at the offset position, facing forward (aligned with camera's forward direction)
-                spawnedSprinter = Instantiate(SprinterPrefab, spawnPosition, Camera.main.transform.rotation);
+                // Create a rotation that respects only the camera's forward direction
+                Quaternion spawnRotation = Quaternion.LookRotation(Camera.main.transform.forward, Vector3.up);
 
-                // 
+                // Instantiate the sprinter
+                spawnedSprinter = Instantiate(SprinterPrefab, spawnPosition, spawnRotation);
+
+                if (spawnedSprinter == null)
+                {
+                    Debug.LogError("Failed to spawn the sprinter");
+                }
+                else
+                {
+                    Debug.Log("Sprinter successfully spawned");
+                }
+            }
+            else
+            {
+                Debug.LogError("Raycasting failed");
             }
         }
-
+        
         private void OnStartRaceButtonPressed()
         {
             // Code to start the race countdown
@@ -135,6 +176,7 @@ namespace _OlympicPulse.Scripts.SprintScripts
 
         public void InitializeRace()
         {
+            Debug.Log("InitializeRace called");
             if (spawnedSprinter && spawnedFinishLine)
             {
                 raceCountdown = RaceCountdownDuration;
