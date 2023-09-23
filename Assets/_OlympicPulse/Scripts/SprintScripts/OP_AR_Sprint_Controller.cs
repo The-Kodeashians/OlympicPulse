@@ -24,6 +24,7 @@ namespace _OlympicPulse.Scripts.SprintScripts
         [Header("UI Elements")]
         public Button PlaceSprinterButton;
         public Button StartRaceButton;
+        public TextMeshProUGUI CountdownText;
 
         private ARPlaneManager arPlaneManager;
         private ARRaycastManager arRaycastManager;
@@ -47,30 +48,21 @@ namespace _OlympicPulse.Scripts.SprintScripts
 
         private void Update()
         {
-            if (currentRaceState == RaceState.NotStarted)
-            {
-                if (Input.touchCount > 0)
-                {
-                    Touch touch = Input.GetTouch(0);
-                    if (touch.phase == TouchPhase.Began)
-                    {
-                        List<ARRaycastHit> hits = new List<ARRaycastHit>();
-                        if (arRaycastManager.Raycast(touch.position, hits, UnityEngine.XR.ARSubsystems.TrackableType.PlaneWithinPolygon))
-                        {
-                            Pose hitPose = hits[0].pose;
-                            SpawnARObjects(hitPose);
-                        }
-                    }
-                }
-            }
-            else if (currentRaceState == RaceState.Running)
+            if (currentRaceState == RaceState.Running)
             {
                 if (raceCountdown > 0)
                 {
                     raceCountdown -= Time.deltaTime;
+                    if (CountdownText != null)
+                    {
+                        CountdownText.text = Mathf.Ceil(raceCountdown).ToString();
+                    }
                     if (raceCountdown <= 0)
                     {
-                        // Start actual race here
+                        if (CountdownText != null) 
+                        {
+                            CountdownText.text = "";
+                        }
                         if (spawnedSprinter)
                         {
                             spawnedSprinter.GetComponent<OP_Sprinter_Script>().StartRunning();
@@ -85,7 +77,7 @@ namespace _OlympicPulse.Scripts.SprintScripts
                 }
             }
         }
-        
+
         private void OnPlaceSprinterButtonPressed()
         {
             Debug.Log("OnPlaceSprinterButtonPressed called");
@@ -103,43 +95,8 @@ namespace _OlympicPulse.Scripts.SprintScripts
             if (arRaycastManager.Raycast(screenCenter, hits, UnityEngine.XR.ARSubsystems.TrackableType.PlaneWithinPolygon))
             {
                 Pose hitPose = hits[0].pose;
-
-                // Check for null or uninitialized objects
-                if (SprinterPrefab == null)
-                {
-                    Debug.LogError("SprinterPrefab is null");
-                    return;
-                }
-
-                if (Camera.main == null)
-                {
-                    Debug.LogError("Main Camera is null");
-                    return;
-                }
-
-                // If a sprinter already exists, destroy it
-                if (spawnedSprinter != null)
-                {
-                    Destroy(spawnedSprinter);
-                }
-
-                // Offset to the right of the camera (assuming Y is up)
-                Vector3 spawnPosition = hitPose.position + Camera.main.transform.right * 0.5f; // Offset by 0.5 meters to the right
-
-                // Create a rotation that respects only the camera's forward direction
-                Quaternion spawnRotation = Quaternion.LookRotation(Camera.main.transform.forward, Vector3.up);
-
-                // Instantiate the sprinter
-                spawnedSprinter = Instantiate(SprinterPrefab, spawnPosition, spawnRotation);
-
-                if (spawnedSprinter == null)
-                {
-                    Debug.LogError("Failed to spawn the sprinter");
-                }
-                else
-                {
-                    Debug.Log("Sprinter successfully spawned");
-                }
+                SpawnSprinter(hitPose.position);
+                SpawnFinishLine(hitPose.position);
             }
             else
             {
@@ -147,31 +104,29 @@ namespace _OlympicPulse.Scripts.SprintScripts
             }
         }
         
-        private void OnStartRaceButtonPressed()
+        private void SpawnSprinter(Vector3 position)
         {
-            // Code to start the race countdown
-            InitializeRace();
+            if (spawnedSprinter != null)
+            {
+                Destroy(spawnedSprinter);
+            }
+            spawnedSprinter = Instantiate(SprinterPrefab, position, Quaternion.identity);
         }
 
-        private void SpawnARObjects(Pose hitPose)
+        private void SpawnFinishLine(Vector3 position)
         {
-            if (spawnedSprinter == null)
+            // Assuming the finish line is 100 metres ahead of the sprinter
+            Vector3 finishLinePosition = position + Camera.main.transform.forward * 100;
+            if (spawnedFinishLine != null)
             {
-                spawnedSprinter = Instantiate(SprinterPrefab, ARSprinterSpawnPoint.position, ARSprinterSpawnPoint.rotation);
+                Destroy(spawnedFinishLine);
             }
-            else
-            {
-                spawnedSprinter.transform.position = ARSprinterSpawnPoint.position;
-            }
+            spawnedFinishLine = Instantiate(FinishLinePrefab, finishLinePosition, Quaternion.identity);
+        }
 
-            if (spawnedFinishLine == null)
-            {
-                spawnedFinishLine = Instantiate(FinishLinePrefab, ARFinishLineSpawnPoint.position, ARFinishLineSpawnPoint.rotation);
-            }
-            else
-            {
-                spawnedFinishLine.transform.position = ARFinishLineSpawnPoint.position;
-            }
+        private void OnStartRaceButtonPressed()
+        {
+            InitializeRace();
         }
 
         public void InitializeRace()
