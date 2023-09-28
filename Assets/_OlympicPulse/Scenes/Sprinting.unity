@@ -143,6 +143,11 @@ PrefabInstance:
       objectReference: {fileID: 711445659}
     - target: {fileID: 6906088994470590558, guid: 215e7f133c696474bbdb6e034c71862a,
         type: 3}
+      propertyPath: SprinterPrefab
+      value: 
+      objectReference: {fileID: 100096, guid: 89cd3c21608be40f98e22ed74604f2bf, type: 3}
+    - target: {fileID: 6906088994470590558, guid: 215e7f133c696474bbdb6e034c71862a,
+        type: 3}
       propertyPath: StartRaceButton
       value: 
       objectReference: {fileID: 1844301400}

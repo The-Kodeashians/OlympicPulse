@@ -11,15 +11,10 @@ namespace _OlympicPulse.Scripts.SprintScripts
     {
         [Header("Prefabs")]
         public GameObject SprinterPrefab;
-        public GameObject FinishLinePrefab;
-
-        [Header("Spawn Points")]
-        public Transform ARSprinterSpawnPoint;
-        public Transform ARFinishLineSpawnPoint;
 
         [Header("Race Settings")]
-        public float WorldRecordPace; // Pace of the WR (Distance over Time)
-        public float RaceCountdownDuration = 3.0f; // Duration of the countdown before the race starts
+        public float WorldRecordPace;
+        public float RaceCountdownDuration = 3.0f;
 
         [Header("UI Elements")]
         public Button PlaceSprinterButton;
@@ -30,80 +25,76 @@ namespace _OlympicPulse.Scripts.SprintScripts
         private ARRaycastManager arRaycastManager;
 
         private GameObject spawnedSprinter;
-        private GameObject spawnedFinishLine;
-
-        private RaceState currentRaceState = RaceState.NotStarted;
         private float raceTimer = 0.0f;
         private float raceCountdown = 0.0f;
+        private float totalDistanceCovered = 0.0f;
+        private bool raceEnded = false;
+
+        private Vector3 initialPosition;  // To keep track of the initial position of the sprinter
 
         private void Awake()
         {
             arPlaneManager = GetComponent<ARPlaneManager>();
             arRaycastManager = GetComponent<ARRaycastManager>();
-
-            // Set up button listeners
             PlaceSprinterButton.onClick.AddListener(OnPlaceSprinterButtonPressed);
             StartRaceButton.onClick.AddListener(OnStartRaceButtonPressed);
+            raceEnded = false;
         }
 
         private void Update()
         {
-            if (currentRaceState == RaceState.Running)
+            if (raceCountdown > 0)
             {
-                if (raceCountdown > 0)
-                {
-                    raceCountdown -= Time.deltaTime;
-                    if (CountdownText != null)
-                    {
-                        CountdownText.text = Mathf.Ceil(raceCountdown).ToString();
-                    }
-                    if (raceCountdown <= 0)
-                    {
-                        if (CountdownText != null) 
-                        {
-                            CountdownText.text = "";
-                        }
-                        if (spawnedSprinter)
-                        {
-                            spawnedSprinter.GetComponent<OP_Sprinter_Script>().StartRunning();
-                        }
-                    }
-                }
-                else
-                {
-                    raceTimer += Time.deltaTime;
-                    UpdateRunnerPosition();
-                    CheckRaceCompletion();
-                }
+                RunRaceCountdown();
             }
+            else if (raceTimer > 0 && !raceEnded)
+            {
+                RunRace();
+            }
+        }
+
+        private void RunRaceCountdown()
+        {
+            raceCountdown -= Time.deltaTime;
+            if (CountdownText != null)
+            {
+                CountdownText.text = Mathf.Ceil(raceCountdown).ToString();
+            }
+            if (raceCountdown <= 0)
+            {
+                if (CountdownText != null)
+                {
+                    CountdownText.text = "";
+                }
+                if (spawnedSprinter)
+                {
+                    spawnedSprinter.GetComponent<Actions>().Run();
+                }
+                raceTimer = 0.01f;
+            }
+        }
+
+        private void RunRace()
+        {
+            raceTimer += Time.deltaTime;
+            Debug.Log($"Sprinter Position at RunRace(): {spawnedSprinter.transform.position} and at raceTimer: {raceTimer}");
+            UpdateRunnerPosition();
+            CheckRaceCompletion();
         }
 
         private void OnPlaceSprinterButtonPressed()
         {
-            Debug.Log("OnPlaceSprinterButtonPressed called");
-
-            if (arRaycastManager == null)
-            {
-                Debug.LogError("arRaycastManager is null");
-                return;
-            }
-
-            // Raycast from the center of the camera view
             Vector2 screenCenter = new Vector2(Screen.width / 2, Screen.height / 2);
             List<ARRaycastHit> hits = new List<ARRaycastHit>();
-
             if (arRaycastManager.Raycast(screenCenter, hits, UnityEngine.XR.ARSubsystems.TrackableType.PlaneWithinPolygon))
             {
                 Pose hitPose = hits[0].pose;
                 SpawnSprinter(hitPose.position);
-                SpawnFinishLine(hitPose.position);
-            }
-            else
-            {
-                Debug.LogError("Raycasting failed");
+                initialPosition = spawnedSprinter.transform.position;
+                Debug.Log($"Sprinter Position after being placed: {initialPosition}");
             }
         }
-        
+
         private void SpawnSprinter(Vector3 position)
         {
             if (spawnedSprinter != null)
@@ -113,57 +104,61 @@ namespace _OlympicPulse.Scripts.SprintScripts
             spawnedSprinter = Instantiate(SprinterPrefab, position, Quaternion.identity);
         }
 
-        private void SpawnFinishLine(Vector3 position)
-        {
-            // Assuming the finish line is 100 metres ahead of the sprinter
-            Vector3 finishLinePosition = position + Camera.main.transform.forward * 100;
-            if (spawnedFinishLine != null)
-            {
-                Destroy(spawnedFinishLine);
-            }
-            spawnedFinishLine = Instantiate(FinishLinePrefab, finishLinePosition, Quaternion.identity);
-        }
-
         private void OnStartRaceButtonPressed()
         {
-            InitializeRace();
-        }
-
-        public void InitializeRace()
-        {
-            Debug.Log("InitializeRace called");
-            if (spawnedSprinter && spawnedFinishLine)
+            if (spawnedSprinter == null)
             {
-                raceCountdown = RaceCountdownDuration;
-                currentRaceState = RaceState.Running;
+                Debug.LogError("Sprinter is null. Cannot start race.");
+                return;
             }
+            Debug.Log("Starting race countdown.");
+            raceCountdown = RaceCountdownDuration;
+            totalDistanceCovered = 0.0f;
+            raceTimer = 0.0f;
+            raceEnded = false;
+            Debug.Log($"Sprinter Position at OnStartRaceButtonPressed(): {initialPosition}");
         }
 
         private void UpdateRunnerPosition()
         {
-            float distanceToCover = Vector3.Distance(ARSprinterSpawnPoint.position, ARFinishLineSpawnPoint.position);
+            float distanceToCover = 100.0f;
             float distanceCovered = WorldRecordPace * raceTimer;
             float fractionOfJourney = distanceCovered / distanceToCover;
 
-            spawnedSprinter.transform.position = Vector3.Lerp(ARSprinterSpawnPoint.position, ARFinishLineSpawnPoint.position, fractionOfJourney);
+            Vector3 endPosition = initialPosition + spawnedSprinter.transform.forward * 100.0f;
+            Vector3 newPosition = Vector3.Lerp(initialPosition, endPosition, fractionOfJourney);
+
+            spawnedSprinter.transform.position = newPosition;
+            totalDistanceCovered = Vector3.Distance(initialPosition, newPosition);
+
+            Debug.Log("New Position: " + newPosition);
         }
 
         private void CheckRaceCompletion()
         {
-            if (Vector3.Distance(spawnedSprinter.transform.position, ARFinishLineSpawnPoint.position) < 0.1f) // Assuming 0.1 as a close enough threshold
+            Debug.Log("Total Distance Covered: " + totalDistanceCovered);
+
+            if (totalDistanceCovered >= 100.0f && !raceEnded)
             {
+                Debug.Log("Ending Race.");
                 EndRace();
             }
         }
 
         private void EndRace()
         {
-            currentRaceState = RaceState.Finished;
-            if (spawnedSprinter)
+            if (spawnedSprinter == null)
             {
-                spawnedSprinter.GetComponent<OP_Sprinter_Script>().StopRunning();
+                Debug.LogError("Sprinter is null. Cannot end race.");
+                return;
             }
-            // Other end race actions
+            Debug.Log("Race ended. Sprinter should stop.");
+            Debug.Log($"Is Sprinter Active: {spawnedSprinter.activeSelf}");
+            Debug.Log($"Sprinter Position at Race End: {spawnedSprinter.transform.position}");
+
+            spawnedSprinter.GetComponent<Actions>().Stay();
+            raceEnded = true;
+            raceTimer = 0;
         }
     }
 }
