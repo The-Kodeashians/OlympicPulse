@@ -17,6 +17,10 @@ public class Actions : MonoBehaviour {
 		animator.SetBool("Aiming", false);
 		animator.SetFloat ("Speed", 0f);
 		}
+	public bool IsAnimating(string name)
+	{
+		return animator.GetCurrentAnimatorStateInfo(0).IsName(name);
+	}
 
 	public void Walk () {
 		animator.SetBool("Aiming", false);

@@ -5,7 +5,7 @@ using UnityEngine.XR.ARFoundation;
 using TMPro;
 using UnityEngine.UI;
 
-namespace _OlympicPulse.Scripts.SprintScripts
+namespace _OlympicPulse.Scripts
 {
     public class OP_AR_Sprint_Controller : MonoBehaviour
     {
@@ -60,20 +60,25 @@ namespace _OlympicPulse.Scripts.SprintScripts
             {
                 CountdownText.text = Mathf.Ceil(raceCountdown).ToString();
             }
+            // Start the animation at 1 second remaining
+            if (raceCountdown <= 1.0f && !spawnedSprinter.GetComponent<Actions>().IsAnimating("Run"))
+            {
+                if (spawnedSprinter)
+                {
+                    spawnedSprinter.GetComponent<Actions>().Run();
+                }
+            }
+            // End the countdown and start the race
             if (raceCountdown <= 0)
             {
                 if (CountdownText != null)
                 {
                     CountdownText.text = "";
                 }
-                if (spawnedSprinter)
-                {
-                    spawnedSprinter.GetComponent<Actions>().Run();
-                }
                 raceTimer = 0.01f;
             }
         }
-
+        
         private void RunRace()
         {
             raceTimer += Time.deltaTime;
@@ -101,8 +106,16 @@ namespace _OlympicPulse.Scripts.SprintScripts
             {
                 Destroy(spawnedSprinter);
             }
-            spawnedSprinter = Instantiate(SprinterPrefab, position, Quaternion.identity);
+            // Project the camera's forward vector onto the XZ-plane
+            Vector3 projectedForward = Camera.main.transform.forward;
+            projectedForward.y = 0.0f;
+            projectedForward.Normalize();
+    
+            // Use the projected forward vector for the sprinter's orientation
+            Quaternion sprinterOrientation = Quaternion.LookRotation(projectedForward);
+            spawnedSprinter = Instantiate(SprinterPrefab, position, sprinterOrientation);
         }
+
 
         private void OnStartRaceButtonPressed()
         {

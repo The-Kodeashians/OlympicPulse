@@ -1,36 +1,5 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &5427184057604174822
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 622997580020247100}
-  m_Layer: 0
-  m_Name: FinishTransform
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &622997580020247100
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5427184057604174822}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 30}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 7655589605851879706}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &5747262365597830518
 GameObject:
   m_ObjectHideFlags: 0
@@ -98,7 +67,6 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 622997580020247100}
   - {fileID: 8524955276885750871}
   - {fileID: 5601333103330897053}
   m_Father: {fileID: 0}
@@ -116,10 +84,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SprinterPrefab: {fileID: 100096, guid: 89cd3c21608be40f98e22ed74604f2bf, type: 3}
-  FinishLinePrefab: {fileID: 6341332164925697526, guid: ffff884c934b34f168febea8fb74de38,
-    type: 3}
-  ARSprinterSpawnPoint: {fileID: 7655589605851879706}
-  ARFinishLineSpawnPoint: {fileID: 622997580020247100}
   WorldRecordPace: 10.44
   RaceCountdownDuration: 3
   PlaceSprinterButton: {fileID: 0}
