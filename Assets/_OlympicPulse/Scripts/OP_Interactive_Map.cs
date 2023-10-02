@@ -44,22 +44,26 @@ namespace _OlympicPulse.Scripts
                 Vector2 touchOnePrevPos = touchOne.position - touchOne.deltaPosition;
                 float prevTouchDeltaMag = (touchZeroPrevPos - touchOnePrevPos).magnitude;
                 float touchDeltaMag = (touchZero.position - touchOne.position).magnitude;
-                float deltaMagnitudeDiff = prevTouchDeltaMag - touchDeltaMag;
+                float deltaMagnitudeDiff = touchDeltaMag - prevTouchDeltaMag;
 
                 if (_currentObjectInstance != null)
                 {
-                    // Scale the object based on the pinch gesture
-                    float pinchAmount = deltaMagnitudeDiff * 0.02f; // Scale factor
-                    Vector3 newScale = _currentObjectInstance.transform.localScale -
+                    // Calculate the scale factor based on the pinch gesture
+                    float pinchAmount = deltaMagnitudeDiff * 0.0001f;  // Scale factor
+
+                    // Calculate the new scale
+                    Vector3 newScale = _currentObjectInstance.transform.localScale +
                                        new Vector3(pinchAmount, pinchAmount, pinchAmount);
+
                     // Ensure the object doesn't become too small or too large
-                    newScale = new Vector3(Mathf.Clamp(newScale.x, 0.1f, 5f), Mathf.Clamp(newScale.y, 0.1f, 5f),
-                        Mathf.Clamp(newScale.z, 0.1f, 5f));
+                    newScale = new Vector3(Mathf.Clamp(newScale.x, 0.01f, 1f), Mathf.Clamp(newScale.y, 0.01f, 1f),
+                        Mathf.Clamp(newScale.z, 0.01f, 1f));
+
                     _currentObjectInstance.transform.localScale = newScale;
                 }
             }
         }
-
+        
         public void ToggleMap()
         {
             Debug.Log("ToggleMap was called!");
