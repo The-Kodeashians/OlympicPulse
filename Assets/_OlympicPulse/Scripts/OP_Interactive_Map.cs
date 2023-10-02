@@ -66,22 +66,23 @@ namespace _OlympicPulse.Scripts
 
             if (_currentObjectInstance == null)
             {
-                List<ARPlane> allPlanes = new List<ARPlane>();
-                foreach (var plane in arPlaneManager.trackables)
-                {
-                    allPlanes.Add(plane);
-                }
+                Vector2 screenCenter = new Vector2(Screen.width / 2, Screen.height / 2);
+                List<ARRaycastHit> hits = new List<ARRaycastHit>();
 
-                if (allPlanes.Count > 0)
+                // Raycast from the centre of the screen
+                Debug.Log("About to access arPlaneManager");
+                if (arPlaneManager.GetComponent<ARRaycastManager>().Raycast(screenCenter, hits, UnityEngine.XR.ARSubsystems.TrackableType.PlaneWithinPolygon))
                 {
-                    Vector3 instantiatePosition = allPlanes[0].center + new Vector3(0, objectToPlace.transform.localScale.y / 2, 0);
+                    Pose hitPose = hits[0].pose;
+
+                    Vector3 instantiatePosition = hitPose.position + new Vector3(0, objectToPlace.transform.localScale.y / 2, 0);
                     _currentObjectInstance = Instantiate(objectToPlace, instantiatePosition, Quaternion.identity);
-            
+
                     Debug.Log($"Object instantiated at {_currentObjectInstance.transform.position} with scale {_currentObjectInstance.transform.localScale}");
                 }
                 else
                 {
-                    Debug.Log("No AR planes detected.");
+                    Debug.Log("No AR planes detected under the screen centre.");
                 }
             }
             else
