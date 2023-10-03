@@ -42,8 +42,8 @@ namespace _OlympicPulse.Scripts
         {
             // Initialise webcam
             _camTexture = new WebCamTexture();
-            _camTexture.requestedHeight = 480; // lower value
-            _camTexture.requestedWidth = 640; // lower value
+            _camTexture.requestedHeight = 1920;
+            _camTexture.requestedWidth = 1080;
 
             if (_camTexture != null)
             {
