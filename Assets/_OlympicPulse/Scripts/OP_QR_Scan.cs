@@ -4,13 +4,17 @@ using System.Collections.Generic;
 using UnityEngine;
 using ZXing;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 namespace _OlympicPulse.Scripts
 {
     public class OP_QR_SCAN : MonoBehaviour
     {
+        [Header("UI Elements")]
+        public Button scanButton; // Reference to the button in the UI
+        public RawImage overlay; // RawImage to show when a QR code is detected
+
         private WebCamTexture _camTexture;
-        private Rect _screenRect;
 
         // Ticket info
         public string personName;
@@ -18,12 +22,12 @@ namespace _OlympicPulse.Scripts
         public string date;
         public string time;
 
+        private bool isScanning = false; // Flag to indicate if we should scan
+
         void Start()
         {
             // Lock the screen in portrait orientation
             Screen.orientation = ScreenOrientation.Portrait;
-
-            _screenRect = new Rect(0, 0, Screen.width, Screen.height);
 
             Debug.Log("Starting QR Scanner...");
 
@@ -36,11 +40,14 @@ namespace _OlympicPulse.Scripts
             {
                 StartCoroutine(RequestCameraPermission());
             }
+
+            // Set up button listener
+            scanButton.onClick.AddListener(StartScanning);
         }
 
         void InitializeWebCam()
         {
-            // Initialise webcam
+            // Initialize webcam
             _camTexture = new WebCamTexture();
             _camTexture.requestedHeight = 1920;
             _camTexture.requestedWidth = 1080;
@@ -64,112 +71,80 @@ namespace _OlympicPulse.Scripts
             }
         }
 
-        void OnGUI()
+        public void StartScanning()
         {
-            if (_camTexture == null)
+            isScanning = true;
+        }
+
+        void Update()
+        {
+            if (isScanning)
             {
-                Debug.LogError("Camera texture is null.");
-                return;
-            }
-
-            if (!_camTexture.isPlaying)
-            {
-                Debug.LogError("Camera texture is not playing.");
-                return;
-            }
-
-            // Calculate aspect ratio scaling
-            float videoRatio = (float)_camTexture.width / (float)_camTexture.height;
-
-            // Calculate the position to start drawing the texture so that it's centered
-            float startX = (Screen.width - (_screenRect.height * videoRatio)) / 2;
-            Rect scaledRect = new Rect(startX, 0, _screenRect.height * videoRatio, _screenRect.height);
-
-            int rotate = 270;
-
-            // Flip the x-axis to mirror the texture
-            GUIUtility.ScaleAroundPivot(new Vector2(-1, 1),
-                new Vector2(_screenRect.width * 0.5f, _screenRect.height * 0.5f));
-
-            // Rotate the texture
-            GUIUtility.RotateAroundPivot(rotate, new Vector2(_screenRect.width * 0.5f, _screenRect.height * 0.5f));
-
-            // Draw the camera background for the scanner
-            GUI.DrawTexture(scaledRect, _camTexture, ScaleMode.ScaleAndCrop);
-
-            // Revert the rotation to not affect other GUI elements
-            GUIUtility.RotateAroundPivot(-rotate, new Vector2(_screenRect.width * 0.5f, _screenRect.height * 0.5f));
-
-            // Revert the x-axis scale to not affect other GUI elements
-            GUIUtility.ScaleAroundPivot(new Vector2(-1, 1),
-                new Vector2(_screenRect.width * 0.5f, _screenRect.height * 0.5f));
-
-            try
-            {
-                IBarcodeReader barcodeReader = new BarcodeReader();
-                // Decode the current frame
-                var result = barcodeReader.Decode(_camTexture.GetPixels32(), _camTexture.width, _camTexture.height);
-                if (result != null)
+                try
                 {
-                    Debug.Log("DECODED TEXT FROM QR: " + result.Text);
-
-                    // Parse the data from the QR code
-                    string[] pairs = result.Text.Split(',');
-                    foreach (string pair in pairs)
+                    IBarcodeReader barcodeReader = new BarcodeReader();
+                    var result = barcodeReader.Decode(_camTexture.GetPixels32(), _camTexture.width, _camTexture.height);
+                    if (result != null)
                     {
-                        int index = pair.IndexOf(':');
-                        if (index > 0)
+                        overlay.gameObject.SetActive(true);  // Show overlay
+
+                        // Parsing code
+                        string[] pairs = result.Text.Split(',');
+                        foreach (string pair in pairs)
                         {
-                            string key = pair.Substring(0, index);
-                            string value = pair.Substring(index + 1);
+                            int index = pair.IndexOf(':');
+                            if (index > 0)
+                            {
+                                string key = pair.Substring(0, index);
+                                string value = pair.Substring(index + 1);
 
-                            Debug.Log($"Key: '{key}', Value: '{value}'");
-
-                            if (key.Equals("Name"))
-                            {
-                                personName = value;
-                            }
-                            else if (key.Equals("Sport"))
-                            {
-                                sport = value;
-                            }
-                            else if (key.Equals("Date"))
-                            {
-                                date = value;
-                            }
-                            else if (key.Equals("Time"))
-                            {
-                                time = value;
+                                if (key.Equals("Name"))
+                                {
+                                    personName = value;
+                                }
+                                else if (key.Equals("Sport"))
+                                {
+                                    sport = value;
+                                }
+                                else if (key.Equals("Date"))
+                                {
+                                    date = value;
+                                }
+                                else if (key.Equals("Time"))
+                                {
+                                    time = value;
+                                }
                             }
                         }
+
+                        // Log the parsed information
+                        Debug.Log($"Name: {personName}, Sport: {sport}, Date: {date}, Time: {time}");
+
+                        // Stop the camera
+                        if (_camTexture != null)
+                        {
+                            _camTexture.Stop();
+                        }
+
+                        // Store the information in PlayerPrefs
+                        PlayerPrefs.SetString("PersonName", personName);
+                        PlayerPrefs.SetString("Sport", sport);
+                        PlayerPrefs.SetString("Date", date);
+                        PlayerPrefs.SetString("Time", time);
+                        PlayerPrefs.SetInt("HasScannedTicket", 1); // Set flag to indicate a ticket has been scanned
+                        PlayerPrefs.Save();
+
+                        // Load the next scene
+                        StartCoroutine(LoadSceneAfterDelay("PersonalisedWelcome", 1));
+
+                        isScanning = false;  // Stop scanning
+                        overlay.gameObject.SetActive(false);  // Hide overlay
                     }
-
-                    // Log the parsed information
-                    Debug.Log($"Name: {personName}, Sport: {sport}, Date: {date}, Time: {time}");
-
-                    // Stop the camera
-                    if (_camTexture != null)
-                    {
-                        _camTexture.Stop();
-                    }
-
-                    // Store the information in PlayerPrefs
-                    PlayerPrefs.SetString("PersonName", personName);
-                    PlayerPrefs.SetString("Sport", sport);
-                    PlayerPrefs.SetString("Date", date);
-                    PlayerPrefs.SetString("Time", time);
-                    PlayerPrefs.SetInt("HasScannedTicket", 1); // Set flag to indicate a ticket has been scanned
-                    PlayerPrefs.Save();
-
-                    Debug.Log("Attempting to load PersnalisedWelcome scene.");
-
-                    // Load the next scene with a delay
-                    StartCoroutine(LoadSceneAfterDelay("PersonalisedWelcome", 1));
                 }
-            }
-            catch (Exception ex)
-            {
-                Debug.LogWarning(ex.Message);
+                catch (Exception ex)
+                {
+                    Debug.LogWarning(ex.Message);
+                }
             }
         }
 
