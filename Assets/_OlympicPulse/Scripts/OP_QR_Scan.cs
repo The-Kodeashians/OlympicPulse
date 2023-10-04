@@ -95,7 +95,7 @@ namespace _OlympicPulse.Scripts
             GUIUtility.RotateAroundPivot(rotate, new Vector2(_screenRect.width * 0.5f, _screenRect.height * 0.5f));
 
             // Draw the camera background for the scanner
-            GUI.DrawTexture(scaledRect, _camTexture, ScaleMode.ScaleAndCrop);
+            GUI.DrawTexture(scaledRect, _camTexture, ScaleMode.StretchToFill);
 
             // Revert the rotation to not affect other GUI elements
             GUIUtility.RotateAroundPivot(-rotate, new Vector2(_screenRect.width * 0.5f, _screenRect.height * 0.5f));
@@ -103,7 +103,43 @@ namespace _OlympicPulse.Scripts
             // Revert the x-axis scale to not affect other GUI elements
             GUIUtility.ScaleAroundPivot(new Vector2(-1, 1),
                 new Vector2(_screenRect.width * 0.5f, _screenRect.height * 0.5f));
+            
+            // Style for the text
+            GUIStyle style = new GUIStyle();
+            style.fontSize = 50;
+            style.normal.textColor = Color.white;
+            style.alignment = TextAnchor.MiddleCenter;
 
+            // Position and display the text
+            float textWidth = 600;
+            GUI.Label(new Rect((Screen.width - textWidth) / 2, Screen.height - 200, textWidth, 60), "Please scan your ticket's QR code", style);
+
+            // Draw corner arrows
+            int lineLength = 50; // Length of the lines
+            int lineWidth = 5;  // Width of the lines
+            int offset = Screen.width / 3; // Offset from the edge for x coordinate
+            int offset_y = Screen.height / 3; // Offset from the edge for y coordinate
+
+            Texture2D texture = new Texture2D(1, 1);
+            texture.SetPixel(0, 0, Color.white);
+            texture.Apply();
+
+            // Top-left corner
+            GUI.DrawTexture(new Rect(offset, offset_y, lineLength, lineWidth), texture);
+            GUI.DrawTexture(new Rect(offset, offset_y, lineWidth, lineLength), texture);
+
+            // Top-right corner
+            GUI.DrawTexture(new Rect(Screen.width - offset - lineLength, offset_y, lineLength, lineWidth), texture);
+            GUI.DrawTexture(new Rect(Screen.width - offset - lineWidth, offset_y, lineWidth, lineLength), texture);
+
+            // Bottom-left corner
+            GUI.DrawTexture(new Rect(offset, Screen.height - offset_y - lineWidth, lineLength, lineWidth), texture);
+            GUI.DrawTexture(new Rect(offset, Screen.height - offset_y - lineLength, lineWidth, lineLength), texture);
+
+            // Bottom-right corner
+            GUI.DrawTexture(new Rect(Screen.width - offset - lineLength, Screen.height - offset_y - lineWidth, lineLength, lineWidth), texture);
+            GUI.DrawTexture(new Rect(Screen.width - offset - lineWidth, Screen.height - offset_y - lineLength, lineWidth, lineLength), texture);
+            
             try
             {
                 IBarcodeReader barcodeReader = new BarcodeReader();
