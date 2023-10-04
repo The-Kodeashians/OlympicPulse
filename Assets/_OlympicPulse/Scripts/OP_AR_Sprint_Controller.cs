@@ -116,7 +116,6 @@ namespace _OlympicPulse.Scripts
             spawnedSprinter = Instantiate(SprinterPrefab, position, sprinterOrientation);
         }
 
-
         private void OnStartRaceButtonPressed()
         {
             if (spawnedSprinter == null)
