@@ -106,13 +106,10 @@ namespace _OlympicPulse.Scripts
             {
                 Destroy(spawnedSprinter);
             }
-            // Project the camera's forward vector onto the XZ-plane
-            Vector3 projectedForward = Camera.main.transform.forward;
-            projectedForward.y = 0.0f;
-            projectedForward.Normalize();
+            // Orient the sprinter to face the right side of the screen
+            Vector3 cameraRight = Camera.main.transform.right;
+            Quaternion sprinterOrientation = Quaternion.LookRotation(cameraRight);
     
-            // Use the projected forward vector for the sprinter's orientation
-            Quaternion sprinterOrientation = Quaternion.LookRotation(projectedForward);
             spawnedSprinter = Instantiate(SprinterPrefab, position, sprinterOrientation);
         }
 
