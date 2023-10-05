@@ -166,6 +166,11 @@ PrefabInstance:
       propertyPath: PlaceSprinterButton
       value: 
       objectReference: {fileID: 602443534}
+    - target: {fileID: 6906088994470590558, guid: 215e7f133c696474bbdb6e034c71862a,
+        type: 3}
+      propertyPath: WorldRecordTime100m
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 7293084717804590912, guid: 215e7f133c696474bbdb6e034c71862a,
         type: 3}
       propertyPath: m_DetectionMode
