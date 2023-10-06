@@ -11,6 +11,8 @@ namespace _OlympicPulse.Scripts
     {
         [Header("Prefabs")]
         public GameObject SprinterPrefab;
+        public GameObject FinishLinePrefab;
+        public GameObject StartLinePrefab;
 
         [Header("Race Settings")]
         public float WorldRecordTime100m;
@@ -20,11 +22,12 @@ namespace _OlympicPulse.Scripts
         public Button PlaceSprinterButton;
         public Button StartRaceButton;
         public TextMeshProUGUI CountdownText;
-
-        private ARPlaneManager arPlaneManager;
+        
         private ARRaycastManager arRaycastManager;
 
         private GameObject spawnedSprinter;
+        private GameObject spawnedFinishLine;
+        private GameObject spawnedStartLine;
         private float raceTimer = 0.0f;
         private float raceCountdown = 0.0f;
         private float totalDistanceCovered = 0.0f;
@@ -34,7 +37,6 @@ namespace _OlympicPulse.Scripts
 
         private void Awake()
         {
-            arPlaneManager = GetComponent<ARPlaneManager>();
             arRaycastManager = GetComponent<ARRaycastManager>();
             PlaceSprinterButton.onClick.AddListener(OnPlaceSprinterButtonPressed);
             StartRaceButton.onClick.AddListener(OnStartRaceButtonPressed);
@@ -100,20 +102,32 @@ namespace _OlympicPulse.Scripts
 
         private void SpawnSprinter(Vector3 position)
         {
-            if (spawnedSprinter != null)
+            if (spawnedSprinter != null || spawnedFinishLine != null || spawnedStartLine != null)
             {
                 Destroy(spawnedSprinter);
+                Destroy(spawnedFinishLine);
+                Destroy(spawnedStartLine);
             }
 
             // Get the camera's right direction but nullify any tilt in the Y-axis.
             Vector3 cameraRight = Camera.main.transform.right;
             cameraRight.y = 0;
-            cameraRight.Normalize();  // Normalise to ensure it's a unit vector.
+            cameraRight.Normalize();  // Normalize to ensure it's a unit vector.
 
             // Set the sprinter's orientation.
             Quaternion sprinterOrientation = Quaternion.LookRotation(cameraRight);
 
             spawnedSprinter = Instantiate(SprinterPrefab, position, sprinterOrientation);
+
+            // Spawn Finish Line 20 meters in front of the sprinter
+            Vector3 finishLinePosition = position + (spawnedSprinter.transform.forward * 20.0f);
+            spawnedFinishLine = Instantiate(FinishLinePrefab, finishLinePosition, sprinterOrientation);
+
+            // Spawn Start Line 1 metre in front of the sprinter
+            Vector3 startLinePosition = position + (spawnedSprinter.transform.forward * 1.0f);
+            spawnedStartLine = Instantiate(StartLinePrefab, startLinePosition, sprinterOrientation);
+
+            spawnedStartLine.transform.Rotate(0, 180, 0);
         }
 
         private void OnStartRaceButtonPressed()
