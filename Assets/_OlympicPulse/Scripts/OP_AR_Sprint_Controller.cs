@@ -104,8 +104,15 @@ namespace _OlympicPulse.Scripts
             {
                 Destroy(spawnedSprinter);
             }
+
+            // Get the camera's right direction but nullify any tilt in the Y-axis.
             Vector3 cameraRight = Camera.main.transform.right;
+            cameraRight.y = 0;
+            cameraRight.Normalize();  // Normalise to ensure it's a unit vector.
+
+            // Set the sprinter's orientation.
             Quaternion sprinterOrientation = Quaternion.LookRotation(cameraRight);
+
             spawnedSprinter = Instantiate(SprinterPrefab, position, sprinterOrientation);
         }
 
