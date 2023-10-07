@@ -23,6 +23,9 @@ namespace _OlympicPulse.Scripts
         public Button StartRaceButton;
         public TextMeshProUGUI CountdownText;
         
+        [Header("Screen Recorder")]
+        public OP_Screen_Recorder screenRecorder;
+        
         private ARRaycastManager arRaycastManager;
 
         private GameObject spawnedSprinter;
@@ -141,6 +144,12 @@ namespace _OlympicPulse.Scripts
             totalDistanceCovered = 0.0f;
             raceTimer = 0.0f;
             raceEnded = false;
+            
+            // Start the screen recording
+            if (screenRecorder != null)
+            {
+                screenRecorder.StartRecording();
+            }
         }
 
         private void UpdateRunnerPosition()
@@ -177,7 +186,13 @@ namespace _OlympicPulse.Scripts
             }
             spawnedSprinter.GetComponent<Actions>().Stay();
             raceEnded = true;
-            raceTimer = 0;
+            raceTimer = 0; 
+            
+            // Stop the screen recording and show preview
+            if (screenRecorder != null)
+            {
+                screenRecorder.StopRecordingShowPreview();
+            }
         }
     }
 }
