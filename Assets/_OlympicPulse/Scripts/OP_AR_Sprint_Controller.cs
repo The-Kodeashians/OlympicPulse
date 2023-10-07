@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR.ARFoundation;
 using TMPro;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace _OlympicPulse.Scripts
@@ -25,6 +26,9 @@ namespace _OlympicPulse.Scripts
         
         [Header("Screen Recorder")]
         public OP_Screen_Recorder screenRecorder;
+        
+        [Header("Audio")]
+        public AudioSource countdownAudioSource;
         
         private ARRaycastManager arRaycastManager;
 
@@ -61,9 +65,24 @@ namespace _OlympicPulse.Scripts
         private void RunRaceCountdown()
         {
             raceCountdown -= Time.deltaTime;
-            if (CountdownText != null)
+            int ceilCountdown = Mathf.CeilToInt(raceCountdown);
+            CountdownText.text = ceilCountdown > 0 ? ceilCountdown.ToString() : "GO";
+
+            switch (ceilCountdown)
             {
-                CountdownText.text = Mathf.Ceil(raceCountdown).ToString();
+                case 3:
+                    CountdownText.color = Color.red;
+                    break;
+                case 2:
+                    CountdownText.color = Color.yellow;
+                    break;
+                case 1:
+                    CountdownText.color = Color.blue;
+                    break;
+                default:
+                    CountdownText.color = Color.green;
+                    StartCoroutine(FadeText());
+                    break;
             }
 
             if (raceCountdown <= 1.0f && !spawnedSprinter.GetComponent<Actions>().IsAnimating("Run"))
@@ -76,10 +95,6 @@ namespace _OlympicPulse.Scripts
 
             if (raceCountdown <= 0)
             {
-                if (CountdownText != null)
-                {
-                    CountdownText.text = "";
-                }
                 raceTimer = 0.01f;
             }
         }
@@ -140,6 +155,26 @@ namespace _OlympicPulse.Scripts
                 Debug.LogError("Sprinter is null. Cannot start race.");
                 return;
             }
+            
+            // Play the countdown audio clip
+            if (countdownAudioSource != null)
+            {
+                Debug.Log("Attempting to play audio.");  // Debug statement
+                countdownAudioSource.Play();
+                if(countdownAudioSource.isPlaying)
+                {
+                    Debug.Log("Audio is playing.");  // Debug statement
+                }
+                else
+                {
+                    Debug.LogError("Failed to play audio.");  // Debug statement
+                }
+            }
+            else
+            {
+                Debug.LogError("AudioSource is not set.");  // Debug statement
+            }
+            
             raceCountdown = RaceCountdownDuration;
             totalDistanceCovered = 0.0f;
             raceTimer = 0.0f;
@@ -192,6 +227,14 @@ namespace _OlympicPulse.Scripts
             if (screenRecorder != null)
             {
                 screenRecorder.StopRecordingShowPreview();
+            }
+        }
+        private IEnumerator FadeText()
+        {
+            for (float i = 1.0f; i >= 0; i -= Time.deltaTime)
+            {
+                CountdownText.color = new Color(0, 1, 0, i);
+                yield return null;
             }
         }
     }
