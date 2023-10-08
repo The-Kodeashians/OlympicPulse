@@ -1646,6 +1646,7 @@ GameObject:
   - component: {fileID: 11400002}
   - component: {fileID: 11400000}
   - component: {fileID: 7302807922481417304}
+  - component: {fileID: 5920025142318431350}
   m_Layer: 0
   m_Name: FemaleSprinter
   m_TagString: Sprinter
@@ -1750,3 +1751,19 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &5920025142318431350
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 100096}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6fc5e1a97db7e4528ba44cb4422c084c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sprinterName: 
+  sprinterDetails: 
+  worldRecordTime100M: 0
+  sprinterColor: {r: 0.13333334, g: 0.23137257, b: 0.32941177, a: 0}
