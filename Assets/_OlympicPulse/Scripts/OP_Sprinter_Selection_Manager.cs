@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using System;
 
 namespace _OlympicPulse.Scripts
 {
@@ -20,11 +22,11 @@ namespace _OlympicPulse.Scripts
         public GameObject spawnCentre;
         public float radius = 1.0f;
         public int selectedIndex = 0;
-        private Vector2 touchStartPos;
-        private Vector2 touchEndPos;
-        private bool isRotating = false;
+        private Vector2 _touchStartPos;
+        private Vector2 _touchEndPos;
+        private bool _isRotating = false;
 
-        private List<GameObject> allSprinters = new List<GameObject>();
+        private List<GameObject> _allSprinters = new List<GameObject>();
 
         private void Start()
         {
@@ -49,13 +51,38 @@ namespace _OlympicPulse.Scripts
                 Vector3 pos = spawnCentre.transform.position + new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle)) * radius;
                 GameObject sprinter = Instantiate(sprinterPrefab, pos, Quaternion.identity);
                 UpdateSprinterDetails(sprinter, i);
-                allSprinters.Add(sprinter);
+                _allSprinters.Add(sprinter);
             }
+        }
+        
+        public void SelectSprinterButton()
+        {
+            Debug.Log("SelectSprinterButton was called.");
+            // Get the selected sprinter's information
+            SprinterInfo selectedSprinter = selectableSprinters[selectedIndex];
+
+            // Save the selected sprinter's details to PlayerPrefs
+            PlayerPrefs.SetString("SprinterName", selectedSprinter.name);
+            PlayerPrefs.SetString("SprinterDetails", selectedSprinter.details);
+            PlayerPrefs.SetFloat("SprinterWorldRecordTime100M", selectedSprinter.worldRecordTime100M);
+            PlayerPrefs.SetFloat("SprinterColorR", selectedSprinter.color.r);
+            PlayerPrefs.SetFloat("SprinterColorG", selectedSprinter.color.g);
+            PlayerPrefs.SetFloat("SprinterColorB", selectedSprinter.color.b);
+            PlayerPrefs.SetFloat("SprinterColorA", selectedSprinter.color.a);
+            
+            PlayerPrefs.Save();
+            
+            LoadScene("Sprinting");
+        }
+        
+        public void BackButton()
+        {
+            LoadScene("Main");
         }
 
         private void Update()
         {
-            if (!isRotating)
+            if (!_isRotating)
             {
                 // Detect swipe using touch
                 if (Input.touchCount > 0)
@@ -64,14 +91,19 @@ namespace _OlympicPulse.Scripts
 
                     if (touch.phase == TouchPhase.Began)
                     {
-                        touchStartPos = touch.position;
+                        _touchStartPos = touch.position;
                     }
                     else if (touch.phase == TouchPhase.Ended)
                     {
-                        touchEndPos = touch.position;
+                        _touchEndPos = touch.position;
+                        float swipeDistance = Vector2.Distance(_touchStartPos, _touchEndPos);
 
-                        int direction = (touchEndPos.x > touchStartPos.x) ? 1 : -1;
-                        StartCoroutine(RotateRingCoroutine(direction));
+                        // Only rotate if the swipe distance is greater than a threshold
+                        if (swipeDistance > 50)  // Can try different distances here
+                        {
+                            int direction = (_touchEndPos.x > _touchStartPos.x) ? 1 : -1;
+                            StartCoroutine(RotateRingCoroutine(direction));
+                        }
                     }
                 }
                 // Keyboard controls for testing
@@ -88,16 +120,16 @@ namespace _OlympicPulse.Scripts
 
         private IEnumerator RotateRingCoroutine(int direction)
         {
-            if (isRotating)
+            if (_isRotating)
                 yield break;
 
-            isRotating = true;
+            _isRotating = true;
 
             float duration = 1.0f;
             float elapsed = 0.0f;
 
             List<Vector3> initialPositions = new List<Vector3>();
-            foreach (var sprinter in allSprinters)
+            foreach (var sprinter in _allSprinters)
             {
                 initialPositions.Add(sprinter.transform.position);
             }
@@ -105,7 +137,7 @@ namespace _OlympicPulse.Scripts
             selectedIndex = (selectedIndex - direction + selectableSprinters.Count) % selectableSprinters.Count;
 
             List<Vector3> targetPositions = new List<Vector3>();
-            for (int i = 0; i < allSprinters.Count; i++)
+            for (int i = 0; i < _allSprinters.Count; i++)
             {
                 float angle = (i * Mathf.PI * 2 / selectableSprinters.Count) + Mathf.PI / 2 - (selectedIndex * Mathf.PI * 2 / selectableSprinters.Count);
                 Vector3 targetPos = spawnCentre.transform.position + new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle)) * radius;
@@ -117,21 +149,21 @@ namespace _OlympicPulse.Scripts
                 elapsed += Time.deltaTime;
                 float t = Mathf.Clamp01(elapsed / duration);
 
-                for (int i = 0; i < allSprinters.Count; i++)
+                for (int i = 0; i < _allSprinters.Count; i++)
                 {
-                    allSprinters[i].transform.position = Vector3.Lerp(initialPositions[i], targetPositions[i], t);
+                    _allSprinters[i].transform.position = Vector3.Lerp(initialPositions[i], targetPositions[i], t);
                 }
 
                 yield return null;
             }
 
-            for (int i = 0; i < allSprinters.Count; i++)
+            for (int i = 0; i < _allSprinters.Count; i++)
             {
-                allSprinters[i].transform.position = targetPositions[i];
+                _allSprinters[i].transform.position = targetPositions[i];
             }
 
             HighlightSelectedSprinter();
-            isRotating = false;
+            _isRotating = false;
         }
 
         private void UpdateSprinterDetails(GameObject sprinter, int index)
@@ -147,16 +179,29 @@ namespace _OlympicPulse.Scripts
 
         private void HighlightSelectedSprinter()
         {
-            for (int i = 0; i < allSprinters.Count; i++)
+            for (int i = 0; i < _allSprinters.Count; i++)
             {
                 if (i == selectedIndex)
                 {
-                    allSprinters[i].transform.localScale = new Vector3(1.2f, 1.2f, 1.2f);
+                    _allSprinters[i].transform.localScale = new Vector3(1.2f, 1.2f, 1.2f);
                 }
                 else
                 {
-                    allSprinters[i].transform.localScale = Vector3.one;
+                    _allSprinters[i].transform.localScale = Vector3.one;
                 }
+            }
+        }
+        
+        void LoadScene(string sceneName)
+        {
+            try
+            {
+                Debug.Log($"Attempting to load {sceneName} scene.");
+                SceneManager.LoadScene(sceneName);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("An error occurred while loading the scene: " + e.Message);
             }
         }
     }

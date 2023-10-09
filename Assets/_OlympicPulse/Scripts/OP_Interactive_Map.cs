@@ -16,8 +16,7 @@ namespace _OlympicPulse.Scripts
 
         private GameObject _currentObjectInstance; // This will store our instantiated object
 
-        private Vector2
-            _previousTouchDifference; // Stores the difference between two touch points from the previous frame
+        private Vector2 _previousTouchDifference; // Stores the difference between two touch points from the previous frame
 
         private float _previousTouchDistance; // Stores distance between two touch points from the previous frame
 

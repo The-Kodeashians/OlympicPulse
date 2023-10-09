@@ -14,9 +14,12 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/_OlympicPulse/Scenes/PersonalisedWelcome.unity
     guid: 652d5601f2aaaeb4b831ef92b6a9ccbb
-  - enabled: 0
+  - enabled: 1
     path: Assets/_OlympicPulse/Scenes/Main.unity
     guid: 47df0f09fcd32194bb5d5d200684e13e
+  - enabled: 1
+    path: Assets/_OlympicPulse/Scenes/SprintingSelect.unity
+    guid: af803bd93c0a84b0e9baec03188c9411
   - enabled: 1
     path: Assets/_OlympicPulse/Scenes/Sprinting.unity
     guid: 369612c599d7c4405bf8e1654fd20a21

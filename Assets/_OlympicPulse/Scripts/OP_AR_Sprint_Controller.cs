@@ -5,24 +5,26 @@ using UnityEngine.XR.ARFoundation;
 using TMPro;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
+using System;
+using UnityEngine.SceneManagement;
 
 namespace _OlympicPulse.Scripts
 {
     public class OP_AR_Sprint_Controller : MonoBehaviour
     {
         [Header("Prefabs")]
-        public GameObject SprinterPrefab;
-        public GameObject FinishLinePrefab;
-        public GameObject StartLinePrefab;
-
+        public GameObject sprinterPrefab;
+        public GameObject finishLinePrefab;
+        public GameObject startLinePrefab;
+        
         [Header("Race Settings")]
-        public float WorldRecordTime100m;
-        public float RaceCountdownDuration = 3.0f;
+        public float worldRecordTime100M;
+        public float raceCountdownDuration = 3.0f;
 
         [Header("UI Elements")]
-        public Button PlaceSprinterButton;
-        public Button StartRaceButton;
-        public TextMeshProUGUI CountdownText;
+        public Button placeSprinterButton;
+        public Button startRaceButton;
+        public TextMeshProUGUI countdownText;
         
         [Header("Screen Recorder")]
         public OP_Screen_Recorder screenRecorder;
@@ -30,33 +32,39 @@ namespace _OlympicPulse.Scripts
         [Header("Audio")]
         public AudioSource countdownAudioSource;
         
-        private ARRaycastManager arRaycastManager;
+        private ARRaycastManager _arRaycastManager;
 
-        private GameObject spawnedSprinter;
-        private GameObject spawnedFinishLine;
-        private GameObject spawnedStartLine;
-        private float raceTimer = 0.0f;
-        private float raceCountdown = 0.0f;
-        private float totalDistanceCovered = 0.0f;
-        private bool raceEnded = false;
+        private GameObject _spawnedSprinter;
+        private GameObject _spawnedFinishLine;
+        private GameObject _spawnedStartLine;
+        private float _raceTimer = 0.0f;
+        private float _raceCountdown = 0.0f;
+        private float _totalDistanceCovered = 0.0f;
+        private bool _raceEnded = false;
 
-        private Vector3 initialPosition;
+        private Vector3 _initialPosition;
 
         private void Awake()
         {
-            arRaycastManager = GetComponent<ARRaycastManager>();
-            PlaceSprinterButton.onClick.AddListener(OnPlaceSprinterButtonPressed);
-            StartRaceButton.onClick.AddListener(OnStartRaceButtonPressed);
-            raceEnded = false;
+            // Initialize world record time from PlayerPrefs
+            if (PlayerPrefs.HasKey("SprinterWorldRecordTime100M"))
+            {
+                worldRecordTime100M = PlayerPrefs.GetFloat("SprinterWorldRecordTime100M");
+            }
+            
+            _arRaycastManager = GetComponent<ARRaycastManager>();
+            placeSprinterButton.onClick.AddListener(OnPlaceSprinterButtonPressed);
+            startRaceButton.onClick.AddListener(OnStartRaceButtonPressed);
+            _raceEnded = false;
         }
 
         private void Update()
         {
-            if (raceCountdown > 0)
+            if (_raceCountdown > 0)
             {
                 RunRaceCountdown();
             }
-            else if (raceTimer > 0 && !raceEnded)
+            else if (_raceTimer > 0 && !_raceEnded)
             {
                 RunRace();
             }
@@ -64,44 +72,44 @@ namespace _OlympicPulse.Scripts
 
         private void RunRaceCountdown()
         {
-            raceCountdown -= Time.deltaTime;
-            int ceilCountdown = Mathf.CeilToInt(raceCountdown);
-            CountdownText.text = ceilCountdown > 0 ? ceilCountdown.ToString() : "GO";
+            _raceCountdown -= Time.deltaTime;
+            int ceilCountdown = Mathf.CeilToInt(_raceCountdown);
+            countdownText.text = ceilCountdown > 0 ? ceilCountdown.ToString() : "GO";
 
             switch (ceilCountdown)
             {
                 case 3:
-                    CountdownText.color = Color.red;
+                    countdownText.color = Color.red;
                     break;
                 case 2:
-                    CountdownText.color = Color.yellow;
+                    countdownText.color = Color.yellow;
                     break;
                 case 1:
-                    CountdownText.color = Color.blue;
+                    countdownText.color = Color.blue;
                     break;
                 default:
-                    CountdownText.color = Color.green;
+                    countdownText.color = Color.green;
                     StartCoroutine(FadeText());
                     break;
             }
 
-            if (raceCountdown <= 1.0f && !spawnedSprinter.GetComponent<Actions>().IsAnimating("Run"))
+            if (_raceCountdown <= 1.0f && !_spawnedSprinter.GetComponent<Actions>().IsAnimating("Run"))
             {
-                if (spawnedSprinter)
+                if (_spawnedSprinter)
                 {
-                    spawnedSprinter.GetComponent<Actions>().Run();
+                    _spawnedSprinter.GetComponent<Actions>().Run();
                 }
             }
 
-            if (raceCountdown <= 0)
+            if (_raceCountdown <= 0)
             {
-                raceTimer = 0.01f;
+                _raceTimer = 0.01f;
             }
         }
 
         private void RunRace()
         {
-            raceTimer += Time.deltaTime;
+            _raceTimer += Time.deltaTime;
             UpdateRunnerPosition();
             CheckRaceCompletion();
         }
@@ -110,21 +118,21 @@ namespace _OlympicPulse.Scripts
         {
             Vector2 screenCenter = new Vector2(Screen.width / 2, Screen.height / 2);
             List<ARRaycastHit> hits = new List<ARRaycastHit>();
-            if (arRaycastManager.Raycast(screenCenter, hits, UnityEngine.XR.ARSubsystems.TrackableType.PlaneWithinPolygon))
+            if (_arRaycastManager.Raycast(screenCenter, hits, UnityEngine.XR.ARSubsystems.TrackableType.PlaneWithinPolygon))
             {
                 Pose hitPose = hits[0].pose;
                 SpawnSprinter(hitPose.position);
-                initialPosition = spawnedSprinter.transform.position;
+                _initialPosition = _spawnedSprinter.transform.position;
             }
         }
 
         private void SpawnSprinter(Vector3 position)
         {
-            if (spawnedSprinter != null || spawnedFinishLine != null || spawnedStartLine != null)
+            if (_spawnedSprinter != null || _spawnedFinishLine != null || _spawnedStartLine != null)
             {
-                Destroy(spawnedSprinter);
-                Destroy(spawnedFinishLine);
-                Destroy(spawnedStartLine);
+                Destroy(_spawnedSprinter);
+                Destroy(_spawnedFinishLine);
+                Destroy(_spawnedStartLine);
             }
 
             // Get the camera's right direction but nullify any tilt in the Y-axis.
@@ -135,22 +143,42 @@ namespace _OlympicPulse.Scripts
             // Set the sprinter's orientation.
             Quaternion sprinterOrientation = Quaternion.LookRotation(cameraRight);
 
-            spawnedSprinter = Instantiate(SprinterPrefab, position, sprinterOrientation);
+            _spawnedSprinter = Instantiate(sprinterPrefab, position, sprinterOrientation);
+            
+            // Change the color of the spawned sprinter based on saved color in PlayerPrefs
+            if (PlayerPrefs.HasKey("SprinterColorR") && PlayerPrefs.HasKey("SprinterColorG") &&
+                PlayerPrefs.HasKey("SprinterColorB") && PlayerPrefs.HasKey("SprinterColorA"))
+            {
+                Color savedColor = new Color(
+                    PlayerPrefs.GetFloat("SprinterColorR"),
+                    PlayerPrefs.GetFloat("SprinterColorG"),
+                    PlayerPrefs.GetFloat("SprinterColorB"),
+                    PlayerPrefs.GetFloat("SprinterColorA")
+                );
+
+                // Apply the color to the spawned sprinter
+                OP_Sprinter_Details details = _spawnedSprinter.GetComponent<OP_Sprinter_Details>();
+                if (details != null)
+                {
+                    details.sprinterColor = savedColor;
+                    details.ApplyColor();
+                }
+            }
 
             // Spawn Finish Line 20 meters in front of the sprinter
-            Vector3 finishLinePosition = position + (spawnedSprinter.transform.forward * 20.0f);
-            spawnedFinishLine = Instantiate(FinishLinePrefab, finishLinePosition, sprinterOrientation);
+            Vector3 finishLinePosition = position + (_spawnedSprinter.transform.forward * 20.0f);
+            _spawnedFinishLine = Instantiate(finishLinePrefab, finishLinePosition, sprinterOrientation);
 
             // Spawn Start Line 1 metre in front of the sprinter
-            Vector3 startLinePosition = position + (spawnedSprinter.transform.forward * 1.0f);
-            spawnedStartLine = Instantiate(StartLinePrefab, startLinePosition, sprinterOrientation);
+            Vector3 startLinePosition = position + (_spawnedSprinter.transform.forward * 1.0f);
+            _spawnedStartLine = Instantiate(startLinePrefab, startLinePosition, sprinterOrientation);
 
-            spawnedStartLine.transform.Rotate(0, 180, 0);
+            _spawnedStartLine.transform.Rotate(0, 180, 0);
         }
 
         private void OnStartRaceButtonPressed()
         {
-            if (spawnedSprinter == null)
+            if (_spawnedSprinter == null)
             {
                 Debug.LogError("Sprinter is null. Cannot start race.");
                 return;
@@ -175,10 +203,10 @@ namespace _OlympicPulse.Scripts
                 Debug.LogError("AudioSource is not set.");  // Debug statement
             }
             
-            raceCountdown = RaceCountdownDuration;
-            totalDistanceCovered = 0.0f;
-            raceTimer = 0.0f;
-            raceEnded = false;
+            _raceCountdown = raceCountdownDuration;
+            _totalDistanceCovered = 0.0f;
+            _raceTimer = 0.0f;
+            _raceEnded = false;
             
             // Start the screen recording
             if (screenRecorder != null)
@@ -190,23 +218,23 @@ namespace _OlympicPulse.Scripts
         private void UpdateRunnerPosition()
         {
             // Calculate time and speed for 20 metres based on the world record time for 100 metres
-            float timeFor20m = (20.0f / 100.0f) * WorldRecordTime100m;
+            float timeFor20m = (20.0f / 100.0f) * worldRecordTime100M;
             float speedFor20m = 20.0f / timeFor20m;
 
             // Calculate the distance to move in this frame
             float distanceToMove = speedFor20m * Time.deltaTime;
 
             // Update the sprinter's position
-            Vector3 newPosition = spawnedSprinter.transform.position + spawnedSprinter.transform.forward * distanceToMove;
-            spawnedSprinter.transform.position = newPosition;
+            Vector3 newPosition = _spawnedSprinter.transform.position + _spawnedSprinter.transform.forward * distanceToMove;
+            _spawnedSprinter.transform.position = newPosition;
             
             // Update total distance covered
-            totalDistanceCovered += distanceToMove;
+            _totalDistanceCovered += distanceToMove;
         }
 
         private void CheckRaceCompletion()
         {
-            if (totalDistanceCovered >= 20.0f && !raceEnded)  // Changed to 20 metres
+            if (_totalDistanceCovered >= 20.0f && !_raceEnded)  // Changed to 20 metres
             {
                 EndRace();
             }
@@ -214,14 +242,14 @@ namespace _OlympicPulse.Scripts
 
         private void EndRace()
         {
-            if (spawnedSprinter == null)
+            if (_spawnedSprinter == null)
             {
                 Debug.LogError("Sprinter is null. Cannot end race.");
                 return;
             }
-            spawnedSprinter.GetComponent<Actions>().Stay();
-            raceEnded = true;
-            raceTimer = 0; 
+            _spawnedSprinter.GetComponent<Actions>().Stay();
+            _raceEnded = true;
+            _raceTimer = 0; 
             
             // Stop the screen recording and show preview
             if (screenRecorder != null)
@@ -229,12 +257,31 @@ namespace _OlympicPulse.Scripts
                 screenRecorder.StopRecordingShowPreview();
             }
         }
+        
         private IEnumerator FadeText()
         {
             for (float i = 1.0f; i >= 0; i -= Time.deltaTime)
             {
-                CountdownText.color = new Color(0, 1, 0, i);
+                countdownText.color = new Color(0, 1, 0, i);
                 yield return null;
+            }
+        }
+        
+        public void BackButton()
+        {
+            LoadScene("SprintingSelect");
+        }
+        
+        void LoadScene(string sceneName)
+        {
+            try
+            {
+                Debug.Log($"Attempting to load {sceneName} scene.");
+                SceneManager.LoadScene(sceneName);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("An error occurred while loading the scene: " + e.Message);
             }
         }
     }

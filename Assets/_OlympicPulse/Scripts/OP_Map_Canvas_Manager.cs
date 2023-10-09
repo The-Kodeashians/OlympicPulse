@@ -55,7 +55,7 @@ public class OP_Map_Canvas_Manager : MonoBehaviour
     public void OnSprintingGameButtonClick()
     {
         // Load the "Sprinting" scene
-        LoadScene("Sprinting");
+        LoadScene("SprintingSelect");
     }
     
     void LoadScene(string sceneName)
