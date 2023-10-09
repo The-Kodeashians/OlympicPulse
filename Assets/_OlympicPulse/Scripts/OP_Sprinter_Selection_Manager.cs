@@ -22,87 +22,116 @@ namespace _OlympicPulse.Scripts
         public int selectedIndex = 0;
         private Vector2 touchStartPos;
         private Vector2 touchEndPos;
+        private bool isRotating = false;
 
         private List<GameObject> allSprinters = new List<GameObject>();
 
         private void Start()
         {
-            // Populate list programatically
-            selectableSprinters.Add(new SprinterInfo { name = "Busain Yolt", details = "Fastest man alive", worldRecordTime100M = 9.58f, color = Color.yellow });
-            selectableSprinters.Add(new SprinterInfo { name = "Speedy Gonzales", details = "Fast but not the fastest", worldRecordTime100M = 20f, color = Color.green });
-            selectableSprinters.Add(new SprinterInfo { name = "Moderate", details = "Moderate speed", worldRecordTime100M = 30f, color = Color.blue });
-            selectableSprinters.Add(new SprinterInfo { name = "Slowpoke", details = "Takes it easy", worldRecordTime100M = 40f, color = Color.red });
+            PopulateSprinters();
+            SpawnSprinters();
+            HighlightSelectedSprinter();
+        }
 
-            // Spawn and display all characters
+        private void PopulateSprinters()
+        {
+            selectableSprinters.Add(new SprinterInfo { name = "Busain Yolt", details = "Fastest man alive", worldRecordTime100M = 9.58f, color = Color.white });
+            selectableSprinters.Add(new SprinterInfo { name = "Speedy Gonzales", details = "Fast but not the fastest", worldRecordTime100M = 20f, color = Color.magenta });
+            selectableSprinters.Add(new SprinterInfo { name = "Hol' Up Jones", details = "Moderate speed", worldRecordTime100M = 30f, color = Color.cyan });
+            selectableSprinters.Add(new SprinterInfo { name = "Slowpoke", details = "Takes it easy", worldRecordTime100M = 40f, color = Color.yellow });
+        }
+
+        private void SpawnSprinters()
+        {
             for (int i = 0; i < selectableSprinters.Count; i++)
             {
-                float angle = i * Mathf.PI * 2 / selectableSprinters.Count;
-                Vector3 pos = spawnCentre.transform.position + new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle)) * radius;  // Use SpawnCenter's position here
+                float angle = (i * Mathf.PI * 2 / selectableSprinters.Count) + Mathf.PI / 2 - (selectedIndex * Mathf.PI * 2 / selectableSprinters.Count);
+                Vector3 pos = spawnCentre.transform.position + new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle)) * radius;
                 GameObject sprinter = Instantiate(sprinterPrefab, pos, Quaternion.identity);
                 UpdateSprinterDetails(sprinter, i);
                 allSprinters.Add(sprinter);
             }
-
-
-            // Initialize camera and highlighted character
-            HighlightSelectedSprinter();
         }
 
         private void Update()
         {
-            // Detect swipe using touch
-            if (Input.touchCount > 0)
+            if (!isRotating)
             {
-                Touch touch = Input.GetTouch(0);
-
-                switch (touch.phase)
+                // Detect swipe using touch
+                if (Input.touchCount > 0)
                 {
-                    case TouchPhase.Began:
-                        touchStartPos = touch.position;
-                        break;
+                    Touch touch = Input.GetTouch(0);
 
-                    case TouchPhase.Ended:
+                    if (touch.phase == TouchPhase.Began)
+                    {
+                        touchStartPos = touch.position;
+                    }
+                    else if (touch.phase == TouchPhase.Ended)
+                    {
                         touchEndPos = touch.position;
 
-                        if (touchEndPos.x > touchStartPos.x)
-                        {
-                            selectedIndex = (selectedIndex - 1 + selectableSprinters.Count) % selectableSprinters.Count;
-                        }
-                        else if (touchEndPos.x < touchStartPos.x)
-                        {
-                            selectedIndex = (selectedIndex + 1) % selectableSprinters.Count;
-                        }
-                        
-                        HighlightSelectedSprinter();
-                        RotateRing();
-                        break;
+                        int direction = (touchEndPos.x > touchStartPos.x) ? 1 : -1;
+                        StartCoroutine(RotateRingCoroutine(direction));
+                    }
+                }
+                // Keyboard controls for testing
+                else if (Input.GetKeyDown(KeyCode.Z)) // Swipe left
+                {
+                    StartCoroutine(RotateRingCoroutine(1));
+                }
+                else if (Input.GetKeyDown(KeyCode.X)) // Swipe right
+                {
+                    StartCoroutine(RotateRingCoroutine(-1));
                 }
             }
-            // Keyboard controls for testing
-            if (Input.GetKeyDown(KeyCode.Z)) // Swipe left
-            {
-                selectedIndex = (selectedIndex - 1 + selectableSprinters.Count) % selectableSprinters.Count;
-                HighlightSelectedSprinter();
-                RotateRing();
-            }
-            if (Input.GetKeyDown(KeyCode.X)) // Swipe right
-            {
-                selectedIndex = (selectedIndex + 1) % selectableSprinters.Count;
-                HighlightSelectedSprinter();
-                RotateRing();
-            }
         }
-        
-        private void RotateRing()
+
+        private IEnumerator RotateRingCoroutine(int direction)
         {
+            if (isRotating)
+                yield break;
+
+            isRotating = true;
+
+            float duration = 1.0f;
+            float elapsed = 0.0f;
+
+            List<Vector3> initialPositions = new List<Vector3>();
+            foreach (var sprinter in allSprinters)
+            {
+                initialPositions.Add(sprinter.transform.position);
+            }
+
+            selectedIndex = (selectedIndex - direction + selectableSprinters.Count) % selectableSprinters.Count;
+
+            List<Vector3> targetPositions = new List<Vector3>();
             for (int i = 0; i < allSprinters.Count; i++)
             {
-                float angle = (i - selectedIndex) * Mathf.PI * 2 / selectableSprinters.Count;
+                float angle = (i * Mathf.PI * 2 / selectableSprinters.Count) + Mathf.PI / 2 - (selectedIndex * Mathf.PI * 2 / selectableSprinters.Count);
                 Vector3 targetPos = spawnCentre.transform.position + new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle)) * radius;
-                
-                // Use Vector3.Lerp for smooth transition
-                allSprinters[i].transform.position = Vector3.Lerp(allSprinters[i].transform.position, targetPos, Time.deltaTime * 5);
+                targetPositions.Add(targetPos);
             }
+
+            while (elapsed < duration)
+            {
+                elapsed += Time.deltaTime;
+                float t = Mathf.Clamp01(elapsed / duration);
+
+                for (int i = 0; i < allSprinters.Count; i++)
+                {
+                    allSprinters[i].transform.position = Vector3.Lerp(initialPositions[i], targetPositions[i], t);
+                }
+
+                yield return null;
+            }
+
+            for (int i = 0; i < allSprinters.Count; i++)
+            {
+                allSprinters[i].transform.position = targetPositions[i];
+            }
+
+            HighlightSelectedSprinter();
+            isRotating = false;
         }
 
         private void UpdateSprinterDetails(GameObject sprinter, int index)

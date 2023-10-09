@@ -15,11 +15,33 @@ namespace _OlympicPulse.Scripts
         // Method to apply color to the sprinter
         public void ApplyColor()
         {
-            // Assuming the sprinter object has a Renderer component
-            Renderer rend = GetComponent<Renderer>();
-            if (rend != null)
+            // Find the child GameObject with the SkinnedMeshRenderer
+            Transform childTransform = transform.Find("SportyGirl");
+            if (childTransform != null)
             {
-                rend.material.color = sprinterColor;
+                SkinnedMeshRenderer skinnedMeshRenderer = childTransform.GetComponent<SkinnedMeshRenderer>();
+                if (skinnedMeshRenderer != null)
+                {
+                    Material material = skinnedMeshRenderer.material;
+                    if (material != null && material.HasProperty("_Color"))
+                    {
+                        // Set the color in the shader
+                        material.SetColor("_Color", sprinterColor);
+                        Debug.Log("Color applied: " + sprinterColor);
+                    }
+                    else
+                    {
+                        Debug.LogWarning("Material does not have a '_Color' property.");
+                    }
+                }
+                else
+                {
+                    Debug.LogWarning("No SkinnedMeshRenderer found on the child GameObject.");
+                }
+            }
+            else
+            {
+                Debug.LogWarning("No child GameObject named 'SportyGirl' found.");
             }
         }
     }
