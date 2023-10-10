@@ -25,6 +25,7 @@ namespace _OlympicPulse.Scripts
         public Button placeSprinterButton;
         public Button startRaceButton;
         public TextMeshProUGUI countdownText;
+        public TextMeshProUGUI startRaceButtonText;
         
         [Header("Screen Recorder")]
         public OP_Screen_Recorder screenRecorder;
@@ -54,8 +55,10 @@ namespace _OlympicPulse.Scripts
             
             _arRaycastManager = GetComponent<ARRaycastManager>();
             placeSprinterButton.onClick.AddListener(OnPlaceSprinterButtonPressed);
-            startRaceButton.onClick.AddListener(OnStartRaceButtonPressed);
+            startRaceButton.onClick.AddListener(OnStartOrEndRaceButtonPressed);
+            startRaceButtonText.text = "Start Race";
             _raceEnded = false;
+            
         }
 
         private void Update()
@@ -89,7 +92,7 @@ namespace _OlympicPulse.Scripts
                     break;
                 default:
                     countdownText.color = Color.green;
-                    StartCoroutine(FadeText());
+                    StartCoroutine(FadeTextCountdownText());
                     break;
             }
 
@@ -175,15 +178,56 @@ namespace _OlympicPulse.Scripts
 
             _spawnedStartLine.transform.Rotate(0, 180, 0);
         }
+        
+        private void OnStartOrEndRaceButtonPressed()
+        {
+            // If the race has ended or hasn't started yet, then start the race
+            if (_raceEnded || (_raceTimer == 0 && _raceCountdown <= 0))
+            {
+                OnStartRace();
+                startRaceButtonText.text = "End Race";  // Update the button text
+            }
+            else if (_raceCountdown > 0)
+            {
+                // If the countdown is ongoing, end the countdown
+                EndRaceDuringCountdown();
+                startRaceButtonText.text = "Start Race";  // Update the button text
+            }
+            else
+            {
+                // If the race is ongoing, then end the race immediately
+                EndRace(true);  // Pass true to indicate immediate stop
+                startRaceButtonText.text = "Start Race";  // Update the button text
+            }
+        }
+        
+        private void EndRaceDuringCountdown()
+        {
+            // Stop countdown and set sprinter to idle animation
+            _raceCountdown = 0;
+            _raceTimer = 0;
+            if (_spawnedSprinter != null)
+            {
+                _spawnedSprinter.GetComponent<Actions>().Stay();
+            }
 
-        private void OnStartRaceButtonPressed()
+            // Hide the countdown text and stop audio
+            StartCoroutine(FadeTextCountdownText());
+            if (countdownAudioSource != null && countdownAudioSource.isPlaying)
+            {
+                countdownAudioSource.Stop();
+            }
+        }
+
+
+        private void OnStartRace()
         {
             if (_spawnedSprinter == null)
             {
                 Debug.LogError("Sprinter is null. Cannot start race.");
                 return;
             }
-            
+
             // Play the countdown audio clip
             if (countdownAudioSource != null)
             {
@@ -202,12 +246,12 @@ namespace _OlympicPulse.Scripts
             {
                 Debug.LogError("AudioSource is not set.");  // Debug statement
             }
-            
+
             _raceCountdown = raceCountdownDuration;
             _totalDistanceCovered = 0.0f;
             _raceTimer = 0.0f;
             _raceEnded = false;
-            
+
             // Start the screen recording
             if (screenRecorder != null)
             {
@@ -234,23 +278,66 @@ namespace _OlympicPulse.Scripts
 
         private void CheckRaceCompletion()
         {
-            if (_totalDistanceCovered >= 20.0f && !_raceEnded)  // Changed to 20 metres
+            if (_totalDistanceCovered >= 20.0f && !_raceEnded)
             {
                 EndRace();
+                startRaceButtonText.text = "Start Race";
             }
         }
 
-        private void EndRace()
+        private void EndRace(bool immediateStop = false)
         {
             if (_spawnedSprinter == null)
             {
                 Debug.LogError("Sprinter is null. Cannot end race.");
                 return;
             }
+
+            // Stop the countdown audio
+            if (countdownAudioSource != null && countdownAudioSource.isPlaying)
+            {
+                countdownAudioSource.Stop();
+            }
+
+            // Hide the countdown text
+            StartCoroutine(FadeTextCountdownText());
+
+            // Change the button text back to "Start Race"
+            Text buttonText = startRaceButton.GetComponentInChildren<Text>();
+            if (buttonText != null)
+            {
+                buttonText.text = "Start Race";
+            }
+            else
+            {
+                Debug.LogError("Failed to access the button text component.");
+            }
+
             _spawnedSprinter.GetComponent<Actions>().Stay();
             _raceEnded = true;
             _raceTimer = 0; 
-            
+
+            // Stop the screen recording immediately or after a delay
+            if (immediateStop)
+            {
+                if (screenRecorder != null)
+                {
+                    screenRecorder.StopRecordingShowPreview();
+                }
+            }
+            else
+            {
+                StartCoroutine(StopRecordingAfterDelay(2f));
+            }
+
+            // Reset the Start Race button text
+            startRaceButtonText.text = "Start Race";
+        }
+        
+        private IEnumerator StopRecordingAfterDelay(float delay)
+        {
+            yield return new WaitForSeconds(delay);
+
             // Stop the screen recording and show preview
             if (screenRecorder != null)
             {
@@ -258,7 +345,7 @@ namespace _OlympicPulse.Scripts
             }
         }
         
-        private IEnumerator FadeText()
+        private IEnumerator FadeTextCountdownText()
         {
             for (float i = 1.0f; i >= 0; i -= Time.deltaTime)
             {
