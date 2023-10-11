@@ -141,6 +141,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 336120126600011618, guid: c3f2540758c1347da988a59ba5e25b07,
         type: 3}
+      propertyPath: m_text
+      value: <event> Attendee
+      objectReference: {fileID: 0}
+    - target: {fileID: 336120126600011618, guid: c3f2540758c1347da988a59ba5e25b07,
+        type: 3}
       propertyPath: m_fontColor32.rgba
       value: 4294309365
       objectReference: {fileID: 0}
@@ -478,6 +483,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_TextStyleHashCode
       value: -1183493901
+      objectReference: {fileID: 0}
+    - target: {fileID: 5473530972826953042, guid: c3f2540758c1347da988a59ba5e25b07,
+        type: 3}
+      propertyPath: m_Name
+      value: Event Text
       objectReference: {fileID: 0}
     - target: {fileID: 5726256114470472730, guid: c3f2540758c1347da988a59ba5e25b07,
         type: 3}
@@ -847,6 +857,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &714105134 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 336120126600011618, guid: c3f2540758c1347da988a59ba5e25b07,
+    type: 3}
+  m_PrefabInstance: {fileID: 714105131}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1420030428
 GameObject:
   m_ObjectHideFlags: 0
@@ -880,7 +902,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -0.00012207031}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: -497.20386, y: -1076}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1767743518
@@ -1231,6 +1253,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5110121525900133549, guid: cae09e2ffc544448d9283bb053e043c8,
+        type: 3}
+      propertyPath: eventText
+      value: 
+      objectReference: {fileID: 714105134}
     - target: {fileID: 5110121525900133549, guid: cae09e2ffc544448d9283bb053e043c8,
         type: 3}
       propertyPath: welcomeText

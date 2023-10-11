@@ -9,6 +9,7 @@ namespace _OlympicPulse.Scripts
     public class OP_Welcome_Script : MonoBehaviour
     {
         public TextMeshProUGUI welcomeText;
+        public TextMeshProUGUI eventText;
         public TextMeshProUGUI countdownText;
         public float fadeTime = 2f;
         private Vector2 touchStartPos, touchEndPos;
@@ -31,6 +32,9 @@ namespace _OlympicPulse.Scripts
 
                 // Set welcome message
                 welcomeText.text = $"Welcome, {personName}!";
+
+                // Set event text
+                eventText.text = $"{sport} Attendee";
 
                 // Parse DateTime
                 _eventDateTime = DateTime.ParseExact($"{date} {time}", "dd-MM-yyyy HH:mm", null);
