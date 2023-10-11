@@ -686,6 +686,26 @@ PrefabInstance:
       propertyPath: m_SizeDelta.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1327745584229364092, guid: c3f2540758c1347da988a59ba5e25b07,
+        type: 3}
+      propertyPath: m_fontSize
+      value: 45.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1327745584229364092, guid: c3f2540758c1347da988a59ba5e25b07,
+        type: 3}
+      propertyPath: m_sharedMaterial
+      value: 
+      objectReference: {fileID: 2140474, guid: 8a89fa14b10d46a99122fd4f73fca9a2, type: 2}
+    - target: {fileID: 1327745584229364092, guid: c3f2540758c1347da988a59ba5e25b07,
+        type: 3}
+      propertyPath: m_enableAutoSizing
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1327745584229364092, guid: c3f2540758c1347da988a59ba5e25b07,
+        type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
     - target: {fileID: 1650459541685355455, guid: c3f2540758c1347da988a59ba5e25b07,
         type: 3}
       propertyPath: m_SizeDelta.x
