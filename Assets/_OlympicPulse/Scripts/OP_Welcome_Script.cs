@@ -30,7 +30,7 @@ namespace _OlympicPulse.Scripts
                 Debug.Log($"Retrieved from PlayerPrefs: Date: {date}, Time: {time}");
 
                 // Set welcome message
-                welcomeText.text = $"Welcome, {personName}!\nYou're going to watch {sport}.";
+                welcomeText.text = $"Welcome, {personName}!";
 
                 // Parse DateTime
                 _eventDateTime = DateTime.ParseExact($"{date} {time}", "dd-MM-yyyy HH:mm", null);
