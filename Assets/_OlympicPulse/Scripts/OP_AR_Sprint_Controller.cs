@@ -219,7 +219,6 @@ namespace _OlympicPulse.Scripts
             }
         }
 
-
         private void OnStartRace()
         {
             if (_spawnedSprinter == null)
@@ -227,6 +226,9 @@ namespace _OlympicPulse.Scripts
                 Debug.LogError("Sprinter is null. Cannot start race.");
                 return;
             }
+            
+            // Reset the sprinter's position to the initial position
+            _spawnedSprinter.transform.position = _initialPosition;
 
             // Play the countdown audio clip
             if (countdownAudioSource != null)
