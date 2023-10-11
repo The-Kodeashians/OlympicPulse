@@ -93,7 +93,7 @@ namespace _OlympicPulse.Scripts
                 Debug.Log($"Time remaining: {timeRemaining}");
 
                 // Display the countdown
-                countdownText.text = $"{timeRemaining.Days} days {timeRemaining.Hours} hours {timeRemaining.Minutes} minutes left";
+                countdownText.text = $"{timeRemaining.Days} Days\n{timeRemaining.Hours} Hours\n{timeRemaining.Minutes} Minutes";
 
                 yield return new WaitForSeconds(1);
             }
