@@ -55,6 +55,14 @@ All C# scripts are located in /Assets/_OlympicPulse/Scripts
 - **OP_Welcome_Script**: Displays personalized welcome messages and countdowns based on scanned ticket information.
 - **/XCode/OP_Screen_Recorder/OP_Screen_Recorder.m and .h**: An Objective-C plugin for the recording, preview and save feature for use in the plugins folder.
 
+### Attributions (Free assets used)
+- [Sporty Girl by Jellymobile](https://assetstore.unity.com/packages/3d/characters/humanoids/humans/sporty-girl-29666)
+- [Sprinting Icon by Flat Icons](https://www.flaticon.com/free-icon/sprinter_3343936?term=sprint&page=1&position=3&origin=tag&related_id=3343936)
+- [Seats Icon by Freepik](https://www.flaticon.com/free-icon/seats_919470?term=seats&page=1&position=11&origin=search&related_id=919470)
+- [SimplePoly City - Low Poly Assets Stadium and Trees](https://assetstore.unity.com/packages/3d/environments/simplepoly-city-low-poly-assets-58899)
+- [Props for Track Environment Lowpoly Free](https://assetstore.unity.com/packages/3d/props/props-for-track-environment-lowpoly-free-211494)
+- [UnityFigmaBridge](https://github.com/simonoliver/UnityFigmaBridge)
+
 ## Project Setup
 
 Follow these steps to set up the OlympicPulse project on your local machine:
@@ -70,3 +78,5 @@ Follow these steps to set up the OlympicPulse project on your local machine:
    - Click on "Projects."
    - Click "Open."
    - Locate the root folder of the OlympicPulse repository and select it.
+
+
