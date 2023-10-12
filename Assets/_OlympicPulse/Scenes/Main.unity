@@ -1245,7 +1245,8 @@ PrefabInstance:
         type: 3}
       propertyPath: objectToPlace
       value: 
-      objectReference: {fileID: 100000, guid: 00b78b03851cb0748b61d9005fb73b49, type: 3}
+      objectReference: {fileID: 2610847359980624246, guid: 578806a151b4e4506b4e54dcc619ae9b,
+        type: 3}
     - target: {fileID: 4338835180951002340, guid: b3d01b2ed08074b20ad5b35740573fb9,
         type: 3}
       propertyPath: arPlaneManager
