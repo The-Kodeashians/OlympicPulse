@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using System;
+using TMPro;
 
 namespace _OlympicPulse.Scripts
 {
@@ -22,9 +23,12 @@ namespace _OlympicPulse.Scripts
         public GameObject spawnCentre;
         public float radius = 1.0f;
         public int selectedIndex = 0;
+        public TextMeshProUGUI selectedSprinterDetailsText;
+        public TextMeshProUGUI errorMessage;
         private Vector2 _touchStartPos;
         private Vector2 _touchEndPos;
         private bool _isRotating = false;
+        
 
         private List<GameObject> _allSprinters = new List<GameObject>();
 
@@ -37,10 +41,12 @@ namespace _OlympicPulse.Scripts
 
         private void PopulateSprinters()
         {
-            selectableSprinters.Add(new SprinterInfo { name = "Busain Yolt", details = "Fastest man alive", worldRecordTime100M = 9.58f, color = Color.white });
+            selectableSprinters.Add(new SprinterInfo { name = "Busain Yolt", details = "Fastest person alive", worldRecordTime100M = 9.58f, color = Color.white });
+            selectableSprinters.Add(new SprinterInfo { name = "Flo-Joked", details = "Unlock for 400 tokens.", worldRecordTime100M = 10.49f, color = Color.gray });
+            selectableSprinters.Add(new SprinterInfo { name = "CatchMe Freedman", details = "Unlock for 350 tokens. Australian sprinting legend.", worldRecordTime100M = 11.11f, color = Color.gray });
             selectableSprinters.Add(new SprinterInfo { name = "Speedy Gonzales", details = "Fast but not the fastest", worldRecordTime100M = 20f, color = Color.magenta });
             selectableSprinters.Add(new SprinterInfo { name = "Hol' Up Jones", details = "Moderate speed", worldRecordTime100M = 30f, color = Color.cyan });
-            selectableSprinters.Add(new SprinterInfo { name = "Slowpoke", details = "Takes it easy", worldRecordTime100M = 40f, color = Color.yellow });
+            selectableSprinters.Add(new SprinterInfo { name = "Slowpoke Sally", details = "Takes it easy", worldRecordTime100M = 40f, color = Color.yellow });
         }
 
         private void SpawnSprinters()
@@ -60,6 +66,13 @@ namespace _OlympicPulse.Scripts
             Debug.Log("SelectSprinterButton was called.");
             // Get the selected sprinter's information
             SprinterInfo selectedSprinter = selectableSprinters[selectedIndex];
+            
+            // Add a check here to see if the selected sprinter is one of the locked characters
+            if (selectedSprinter.name == "CatchMe Freedman" || selectedSprinter.name == "Flo-Joked")
+            {
+                ShowError("You haven't unlocked this sprinter yet.");
+                return;
+            }
 
             // Save the selected sprinter's details to PlayerPrefs
             PlayerPrefs.SetString("SprinterName", selectedSprinter.name);
@@ -73,6 +86,26 @@ namespace _OlympicPulse.Scripts
             PlayerPrefs.Save();
             
             LoadScene("Sprinting");
+        }
+        
+        private void ShowError(string message)
+        {
+            errorMessage.text = message;
+            errorMessage.color = new Color(errorMessage.color.r, errorMessage.color.g, errorMessage.color.b, 1); // Set alpha to 1
+            StartCoroutine(FadeOutError(4.0f));
+        }
+
+        private IEnumerator FadeOutError(float duration)
+        {
+            float startTime = Time.time;
+            while (Time.time - startTime <= duration)
+            {
+                float t = (Time.time - startTime) / duration;
+                errorMessage.color = new Color(errorMessage.color.r, errorMessage.color.g, errorMessage.color.b, Mathf.Lerp(1, 0, t));
+                yield return null;
+            }
+            errorMessage.color = new Color(errorMessage.color.r, errorMessage.color.g, errorMessage.color.b, 0); // Ensure alpha is 0
+            errorMessage.text = "";
         }
         
         public void BackButton()
@@ -184,6 +217,10 @@ namespace _OlympicPulse.Scripts
                 if (i == selectedIndex)
                 {
                     _allSprinters[i].transform.localScale = new Vector3(1.2f, 1.2f, 1.2f);
+                    SprinterInfo selectedSprinter = selectableSprinters[selectedIndex];
+                    selectedSprinterDetailsText.text = $"Name: {selectedSprinter.name}\n" +
+                                               $"Record for 100m: {selectedSprinter.worldRecordTime100M}s\n" +
+                                               $"Bio: {selectedSprinter.details}";
                 }
                 else
                 {
