@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.SceneManagement;
+using System;
 
 namespace _OlympicPulse.Scripts
 { 
@@ -61,6 +63,11 @@ namespace _OlympicPulse.Scripts
                     _currentObjectInstance.transform.localScale = newScale;
                 }
             }
+        }
+
+        public void OnBackButtonPress()
+        {
+            LoadScene("PersonalisedWelcome");
         }
         
         public void ToggleMap()
@@ -128,6 +135,19 @@ namespace _OlympicPulse.Scripts
             // Unsubscribe from the planesChanged event
             arPlaneManager.planesChanged -= OnPlaneAdded;
             arPlaneManager.planesChanged -= OnPlaneRemoved;
+        }
+        
+        void LoadScene(string sceneName)
+        {
+            try
+            {
+                Debug.Log($"Attempting to load {sceneName} scene.");
+                SceneManager.LoadScene(sceneName);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("An error occurred while loading the scene: " + e.Message);
+            }
         }
     }
 }

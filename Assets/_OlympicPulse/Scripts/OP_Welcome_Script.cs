@@ -9,7 +9,7 @@ namespace _OlympicPulse.Scripts
     public class OP_Welcome_Script : MonoBehaviour
     {
         public TextMeshProUGUI welcomeText;
-        public TextMeshProUGUI eventText;
+        //public TextMeshProUGUI eventText;
         public TextMeshProUGUI countdownText;
         public float fadeTime = 2f;
         private Vector2 touchStartPos, touchEndPos;
@@ -34,7 +34,7 @@ namespace _OlympicPulse.Scripts
                 welcomeText.text = $"Welcome, {personName}!";
 
                 // Set event text
-                eventText.text = $"{sport} Attendee";
+                //eventText.text = $"{sport} Attendee";
 
                 // Parse DateTime
                 _eventDateTime = DateTime.ParseExact($"{date} {time}", "dd-MM-yyyy HH:mm", null);
@@ -50,40 +50,11 @@ namespace _OlympicPulse.Scripts
                 Debug.LogError($"An error occurred: {e.Message}");
             }
         }
-        
-        void Update()
+
+        public void ToMainButtonPress()
         {
-            // Swipe-up detection
-            if (Input.touchCount > 0)
-            {
-                Touch touch = Input.GetTouch(0);
-
-                switch (touch.phase)
-                {
-                    case TouchPhase.Began:
-                        touchStartPos = touch.position;
-                        break;
-                    case TouchPhase.Ended:
-                        touchEndPos = touch.position;
-                        if (touchEndPos.y - touchStartPos.y > 100) // Swipe sensitivity
-                        {
-                            swipedUp = true;
-                        }
-
-                        break;
-                }
-            }
-            
-            // Keyboard input for desktop or Mac
-            if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
-            {
-                swipedUp = true;
-            }
-
-            if (swipedUp)
-            {
-                LoadScene("Main");
-            }
+            Debug.Log("Main Button pressed");
+            LoadScene("Main");
         }
 
         IEnumerator CountdownToEvent()
@@ -97,42 +68,12 @@ namespace _OlympicPulse.Scripts
                 Debug.Log($"Time remaining: {timeRemaining}");
 
                 // Display the countdown
-                countdownText.text = $"{timeRemaining.Days} Days\n{timeRemaining.Hours} Hours\n{timeRemaining.Minutes} Minutes";
+                countdownText.text = $"{timeRemaining.Days} Days\n{timeRemaining.Hours} Hours\n{timeRemaining.Minutes} Minutes\n{timeRemaining.Seconds} Seconds";
 
                 yield return new WaitForSeconds(1);
             }
         }
         
-        IEnumerator FadeToMainSceneAfterDelay(float delay)
-        {
-            yield return new WaitForSeconds(delay);
-            Debug.Log("Time is up, starting fade.");
-            StartCoroutine(FadeToMainScene());
-        }
-
-        IEnumerator FadeToMainScene()
-        {
-            CanvasGroup canvasGroup = GetComponent<CanvasGroup>();
-            if (canvasGroup == null)
-            {
-                Debug.LogError("CanvasGroup component missing.");
-                yield break;
-            }
-
-            float rate = 1f / fadeTime;
-            float progress = 0f;
-
-            while (progress < 1f)
-            {
-                canvasGroup.alpha = Mathf.Lerp(1f, 0f, progress);
-                progress += rate * Time.deltaTime;
-                yield return null;
-            }
-
-            // Load the Main scene
-            Debug.Log("Loading Main scene.");
-            LoadScene("Main");
-        }
         void LoadScene(string sceneName)
         {
             try
