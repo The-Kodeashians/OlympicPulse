@@ -5,18 +5,32 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-/**
- * Responsible for setting World Space Event Camera
- * and facing the canvas towards the camera at all times
- */
+/// <summary>
+/// Manages the world-space canvas for the interactive map.
+/// This script is attached to the Stadium final prefab inside the canvas and is intended for the
+/// Main scene after the user places the map.
+/// </summary>
 public class OP_Map_Canvas_Manager : MonoBehaviour
 {
+    /// <summary>
+    /// Reference to the main camera in the scene.
+    /// </summary>
     private Camera mainCamera;
+    
+    /// <summary>
+    /// Reference to the canvas component.
+    /// </summary>
     private Canvas canvas;
     
+    /// <summary>
+    /// Buttons for in-game actions, like starting the sprinting game.
+    /// </summary>
     [Header("Game Buttons")]
     public Button sprintingGameButton; // Assign this in the inspector
 
+    /// <summary>
+    /// Initialization logic to find and assign the main camera and canvas.
+    /// </summary>
     void Start()
     {
         mainCamera = Camera.main;
@@ -45,19 +59,28 @@ public class OP_Map_Canvas_Manager : MonoBehaviour
         }
     }
     
+    /// <summary>
+    /// Updates the canvas orientation to always face the camera.
+    /// </summary>
     void Update()
     {
         transform.LookAt(transform.position + mainCamera.transform.rotation * Vector3.forward,
             mainCamera.transform.rotation * Vector3.up);
     }
 
-    // This function will be called when the button is clicked
+    /// <summary>
+    /// Handles the click event for the sprinting game button.
+    /// </summary>
     public void OnSprintingGameButtonClick()
     {
         // Load the "Sprinting" scene
         LoadScene("SprintingSelect");
     }
     
+    /// <summary>
+    /// Loads the specified Unity scene.
+    /// </summary>
+    /// <param name="sceneName">The name of the scene to load.</param>
     void LoadScene(string sceneName)
     {
         try

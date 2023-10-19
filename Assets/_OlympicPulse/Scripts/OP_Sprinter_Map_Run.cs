@@ -2,6 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Manages the behavior of a sprinter on the interactive map.
+/// The sprinter will run a specified distance and then stay for a while before running back.
+/// This script is intended to be attached to a sprinter character in the Main scene on the interactive map.
+/// </summary>
 public class OP_Sprinter_Map_Run : MonoBehaviour
 {
     public float distanceToRun = 10.0f; // Distance the sprinter will run in meters
@@ -10,14 +15,14 @@ public class OP_Sprinter_Map_Run : MonoBehaviour
 
     private Vector3 startingPosition;
     private Vector3 targetPosition;
-
+    
     void Start()
     {
         startingPosition = transform.position; // The position where the sprinter starts
         targetPosition = transform.position + transform.forward * distanceToRun; // Target position based on the distanceToRun
         StartCoroutine(RunAndStay());
     }
-
+    
     private IEnumerator RunAndStay()
     {
         while (true)

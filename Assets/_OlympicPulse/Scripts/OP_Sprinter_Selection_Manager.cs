@@ -7,8 +7,15 @@ using TMPro;
 
 namespace _OlympicPulse.Scripts
 {
+    /// <summary>
+    /// Manages the selection of sprinters in the SprinterSelect scene.
+    /// This script is intended to be attached to the SprinterSelectionManager prefab.
+    /// </summary>
     public class OP_Sprinter_Selection_Manager : MonoBehaviour
     {
+        /// <summary>
+        /// Class to hold information about each selectable sprinter.
+        /// </summary>
         [System.Serializable]
         public class SprinterInfo
         {
@@ -32,6 +39,9 @@ namespace _OlympicPulse.Scripts
 
         private List<GameObject> _allSprinters = new List<GameObject>();
 
+        /// <summary>
+        /// Initializes the sprinter selection scene by populating and spawning the sprinters.
+        /// </summary>
         private void Start()
         {
             PopulateSprinters();
@@ -39,6 +49,9 @@ namespace _OlympicPulse.Scripts
             HighlightSelectedSprinter();
         }
 
+        /// <summary>
+        /// Populates the list of selectable sprinters.
+        /// </summary>
         private void PopulateSprinters()
         {
             selectableSprinters.Add(new SprinterInfo { name = "Busain Yolt", details = "Fastest person alive", worldRecordTime100M = 9.58f, color = Color.white });
@@ -49,6 +62,9 @@ namespace _OlympicPulse.Scripts
             selectableSprinters.Add(new SprinterInfo { name = "Slowpoke Sally", details = "Takes it easy", worldRecordTime100M = 40f, color = Color.yellow });
         }
 
+        /// <summary>
+        /// Spawns the sprinters around the center point.
+        /// </summary>
         private void SpawnSprinters()
         {
             for (int i = 0; i < selectableSprinters.Count; i++)
@@ -61,6 +77,9 @@ namespace _OlympicPulse.Scripts
             }
         }
         
+        /// <summary>
+        /// Handles the button press event for selecting a sprinter.
+        /// </summary>
         public void SelectSprinterButton()
         {
             Debug.Log("SelectSprinterButton was called.");
@@ -88,6 +107,10 @@ namespace _OlympicPulse.Scripts
             LoadScene("Sprinting");
         }
         
+        /// <summary>
+        /// Shows an error message and fades it out after a duration.
+        /// </summary>
+        /// <param name="message">The error message to display.</param>
         private void ShowError(string message)
         {
             errorMessage.text = message;
@@ -95,6 +118,11 @@ namespace _OlympicPulse.Scripts
             StartCoroutine(FadeOutError(4.0f));
         }
 
+        /// <summary>
+        /// Fades out the error message over a given duration.
+        /// </summary>
+        /// <param name="duration">The duration for the fade out.</param>
+        /// <returns>An IEnumerator to manage the coroutine.</returns>
         private IEnumerator FadeOutError(float duration)
         {
             float startTime = Time.time;
@@ -108,11 +136,17 @@ namespace _OlympicPulse.Scripts
             errorMessage.text = "";
         }
         
+        /// <summary>
+        /// Loads the Main scene when the Back button is pressed.
+        /// </summary>
         public void BackButton()
         {
             LoadScene("Main");
         }
 
+        /// <summary>
+        /// Updates the UI and logic for sprinter selection.
+        /// </summary>
         private void Update()
         {
             if (!_isRotating)
@@ -151,6 +185,11 @@ namespace _OlympicPulse.Scripts
             }
         }
 
+        /// <summary>
+        /// Coroutine to rotate the ring of sprinters.
+        /// </summary>
+        /// <param name="direction">The direction of rotation. +1 for clockwise, -1 for counter-clockwise.</param>
+        /// <returns>An IEnumerator to manage the coroutine.</returns>
         private IEnumerator RotateRingCoroutine(int direction)
         {
             if (_isRotating)
@@ -199,6 +238,11 @@ namespace _OlympicPulse.Scripts
             _isRotating = false;
         }
 
+        /// <summary>
+        /// Updates the details of the spawned sprinter GameObject.
+        /// </summary>
+        /// <param name="sprinter">The GameObject representing the sprinter.</param>
+        /// <param name="index">The index of the sprinter in the selectableSprinters list.</param>
         private void UpdateSprinterDetails(GameObject sprinter, int index)
         {
             OP_Sprinter_Details details = sprinter.GetComponent<OP_Sprinter_Details>();
@@ -210,6 +254,9 @@ namespace _OlympicPulse.Scripts
             details.ApplyColor();
         }
 
+        /// <summary>
+        /// Highlights the currently selected sprinter and updates the details text.
+        /// </summary>
         private void HighlightSelectedSprinter()
         {
             for (int i = 0; i < _allSprinters.Count; i++)
@@ -229,6 +276,10 @@ namespace _OlympicPulse.Scripts
             }
         }
         
+        /// <summary>
+        /// Load a given scene by its name.
+        /// </summary>
+        /// <param name="sceneName">The name of the scene to load.</param>
         void LoadScene(string sceneName)
         {
             try

@@ -6,32 +6,47 @@ using UnityEngine.UI;
 
 namespace _OlympicPulse.Scripts
 {
+    /// <summary>
+    /// Manages the introductory splash screen user input for scene transition.
+    /// This script is attached to the IntroScript prefab in the Intro scene.
+    /// </summary>
     public class OP_Intro_Script : MonoBehaviour
     {
-        public RawImage splashImage;
-        public float splashTime = 2f;
-        private Vector2 touchStartPos, touchEndPos;
+        /// <summary>
+        /// Start position of a touch event for swipe-up detection.
+        /// </summary>
+        private Vector2 touchStartPos;
+
+        /// <summary>
+        /// End position of a touch event for swipe-up detection.
+        /// </summary>
+        private Vector2 touchEndPos;
+
+        /// <summary>
+        /// Flag to indicate if a swipe-up has been detected.
+        /// </summary>
         private bool swipedUp = false;
 
+        /// <summary>
+        /// Initializes the script, setting up user input.
+        /// </summary>
         void Start()
         {
             Debug.Log("Starting QR Scanner...");
-
-            splashImage.color = new Color(1f, 1f, 1f, 1f); // Fully Visible
-
+            
             // Check if user has already scanned a ticket
+            // Commented out for demo
+            /**
             if (PlayerPrefs.HasKey("HasScannedTicket"))
             {
                 // User has scanned before. Load the Main scene.
                 LoadScene("Main");
-            }
-            else
-            {
-                // Start splash screen routine
-                StartCoroutine(FadeOutSplash(splashTime));
-            }
+            }*/
         }
 
+        /// <summary>
+        /// Updates the script each frame to handle user input for scene transition.
+        /// </summary>
         void Update()
         {
             // Swipe-up detection
@@ -67,23 +82,10 @@ namespace _OlympicPulse.Scripts
             }
         }
 
-        IEnumerator FadeOutSplash(float time)
-        {
-            Color startColor = splashImage.color;
-
-            float rate = 1f / time;
-            float progress = 0f;
-
-            while (progress < 1f)
-            {
-                splashImage.color = Color.Lerp(startColor, new Color(1f, 1f, 1f, 0f), progress);
-                progress += rate * Time.deltaTime;
-                yield return null;
-            }
-
-            splashImage.color = new Color(1f, 1f, 1f, 0f); // Fully transparent
-        }
-
+        /// <summary>
+        /// Loads a specified Unity scene.
+        /// </summary>
+        /// <param name="sceneName">The name of the scene to load.</param>
         void LoadScene(string sceneName)
         {
             try

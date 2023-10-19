@@ -10,6 +10,10 @@ using UnityEngine.SceneManagement;
 
 namespace _OlympicPulse.Scripts
 {
+    /// <summary>
+    /// Manages the AR sprinting game logic.
+    /// This script is intended to be attached to the ARSprintController 1 prefab in the Sprinting scene.
+    /// </summary>
     public class OP_AR_Sprint_Controller : MonoBehaviour
     {
         [Header("Prefabs")]
@@ -45,6 +49,9 @@ namespace _OlympicPulse.Scripts
 
         private Vector3 _initialPosition;
 
+        /// <summary>
+        /// Called on the frame when a script is enabled just before any of the Update methods are called the first time.
+        /// </summary>
         private void Awake()
         {
             // Initialize world record time from PlayerPrefs
@@ -61,6 +68,9 @@ namespace _OlympicPulse.Scripts
             
         }
 
+        /// <summary>
+        /// Update is called once per frame.
+        /// </summary>
         private void Update()
         {
             if (_raceCountdown > 0)
@@ -73,6 +83,9 @@ namespace _OlympicPulse.Scripts
             }
         }
 
+        /// <summary>
+        /// Executes the race countdown logic.
+        /// </summary>
         private void RunRaceCountdown()
         {
             _raceCountdown -= Time.deltaTime;
@@ -110,6 +123,9 @@ namespace _OlympicPulse.Scripts
             }
         }
 
+        /// <summary>
+        /// Executes the race logic.
+        /// </summary>
         private void RunRace()
         {
             _raceTimer += Time.deltaTime;
@@ -117,6 +133,9 @@ namespace _OlympicPulse.Scripts
             CheckRaceCompletion();
         }
 
+        /// <summary>
+        /// Called when the "Place Sprinter" button is pressed.
+        /// </summary>
         private void OnPlaceSprinterButtonPressed()
         {
             Vector2 screenCenter = new Vector2(Screen.width / 2, Screen.height / 2);
@@ -129,6 +148,10 @@ namespace _OlympicPulse.Scripts
             }
         }
 
+        /// <summary>
+        /// Spawns the sprinter and the start and finish lines at a specified position.
+        /// </summary>
+        /// <param name="position">The position to spawn the sprinter and lines.</param>
         private void SpawnSprinter(Vector3 position)
         {
             if (_spawnedSprinter != null || _spawnedFinishLine != null || _spawnedStartLine != null)
@@ -179,6 +202,9 @@ namespace _OlympicPulse.Scripts
             _spawnedStartLine.transform.Rotate(0, 180, 0);
         }
         
+        /// <summary>
+        /// Called when the "Start or End Race" button is pressed.
+        /// </summary>
         private void OnStartOrEndRaceButtonPressed()
         {
             // If the race has ended or hasn't started yet, then start the race
@@ -201,6 +227,9 @@ namespace _OlympicPulse.Scripts
             }
         }
         
+        /// <summary>
+        /// Ends the race during countdown.
+        /// </summary>
         private void EndRaceDuringCountdown()
         {
             // Stop countdown and set sprinter to idle animation
@@ -219,6 +248,9 @@ namespace _OlympicPulse.Scripts
             }
         }
 
+        /// <summary>
+        /// Starts the race.
+        /// </summary>
         private void OnStartRace()
         {
             if (_spawnedSprinter == null)
@@ -261,6 +293,9 @@ namespace _OlympicPulse.Scripts
             }
         }
 
+        /// <summary>
+        /// Updates the runner's position during the race.
+        /// </summary>
         private void UpdateRunnerPosition()
         {
             // Calculate time and speed for 20 metres based on the world record time for 100 metres
@@ -278,6 +313,9 @@ namespace _OlympicPulse.Scripts
             _totalDistanceCovered += distanceToMove;
         }
 
+        /// <summary>
+        /// Checks for race completion and ends the race if completed.
+        /// </summary>
         private void CheckRaceCompletion()
         {
             if (_totalDistanceCovered >= 20.0f && !_raceEnded)
@@ -287,6 +325,10 @@ namespace _OlympicPulse.Scripts
             }
         }
 
+        /// <summary>
+        /// Ends the race.
+        /// </summary>
+        /// <param name="immediateStop">Whether to stop the race immediately or not.</param>
         private void EndRace(bool immediateStop = false)
         {
             if (_spawnedSprinter == null)
@@ -336,6 +378,11 @@ namespace _OlympicPulse.Scripts
             startRaceButtonText.text = "Start Race";
         }
         
+        /// <summary>
+        /// Coroutine to stop recording after a delay.
+        /// </summary>
+        /// <param name="delay">The delay in seconds.</param>
+        /// <returns>IEnumerator for coroutine.</returns>
         private IEnumerator StopRecordingAfterDelay(float delay)
         {
             yield return new WaitForSeconds(delay);
@@ -347,6 +394,10 @@ namespace _OlympicPulse.Scripts
             }
         }
         
+        /// <summary>
+        /// Coroutine to fade out the countdown text.
+        /// </summary>
+        /// <returns>IEnumerator for coroutine.</returns>
         private IEnumerator FadeTextCountdownText()
         {
             for (float i = 1.0f; i >= 0; i -= Time.deltaTime)
@@ -356,11 +407,18 @@ namespace _OlympicPulse.Scripts
             }
         }
         
+        /// <summary>
+        /// Called when the "Back" button is pressed. Loads the SprintingSelect scene.
+        /// </summary>
         public void BackButton()
         {
             LoadScene("SprintingSelect");
         }
         
+        /// <summary>
+        /// Loads a scene by its name.
+        /// </summary>
+        /// <param name="sceneName">The name of the scene to load.</param>
         void LoadScene(string sceneName)
         {
             try

@@ -50,7 +50,7 @@ All C# scripts are located in /Assets/_OlympicPulse/Scripts
 - **OP_QR_Scan**: Manages the QR code scanning functionality and stores ticket information.
 - **OP_Screen_Recorder**: Handles screen recording features for the app.
 - **OP_Sprinter_Details**: Stores and manages the details of the sprinters available for the AR sprinting game.
-- **OP_Sprinter_Map_Run**: Controls the sprinter's running behavior on the map.
+- **OP_Sprinter_Map_Run**: Controls the sprinter's running behavior on the map. (not implemented)
 - **OP_Sprinter_Selection_Manager**: Manages the selection process for choosing a sprinter in the AR sprinting game.
 - **OP_Welcome_Script**: Displays personalized welcome messages and countdowns based on scanned ticket information.
 - **/XCode/OP_Screen_Recorder/OP_Screen_Recorder.m and .h**: An Objective-C plugin for the recording, preview and save feature for use in the plugins folder.
@@ -78,5 +78,3 @@ Follow these steps to set up the OlympicPulse project on your local machine:
    - Click on "Projects."
    - Click "Open."
    - Locate the root folder of the OlympicPulse repository and select it.
-
-

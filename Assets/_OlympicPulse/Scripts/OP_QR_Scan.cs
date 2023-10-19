@@ -7,17 +7,34 @@ using UnityEngine.SceneManagement;
 
 namespace _OlympicPulse.Scripts
 {
+    /// <summary>
+    /// Manages the QR code scanning logic and transitions to other scenes.
+    /// This script is attached to the TicketScanner prefab in the TicketScan scene.
+    /// </summary>
     public class OP_QR_SCAN : MonoBehaviour
     {
+        /// <summary>
+        /// Webcam texture for capturing the QR code.
+        /// </summary>
         private WebCamTexture _camTexture;
+        
+        /// <summary>
+        /// Rectangle representing the screen dimensions.
+        /// </summary>
         private Rect _screenRect;
 
-        // Ticket info
+        /// <summary>
+        // Scanned in information from the QR code.
+        // </summary>
         public string personName;
         public string sport;
-        public string date;
-        public string time;
+        public string date; // Must be "DD-MM-YYYY"
+        public string time; // Must be 24hr time, e.g. "18:00"
 
+        /// <summary>
+        /// Initializes the script.
+        /// Sets screen orientation and initializes the webcam if permission is granted.
+        /// </summary>
         void Start()
         {
             // Lock the screen in portrait orientation
@@ -38,6 +55,10 @@ namespace _OlympicPulse.Scripts
             }
         }
 
+        /// <summary>
+        /// Initializes the webcam for QR scanning.
+        /// Called in the Start() method.
+        /// </summary>
         void InitializeWebCam()
         {
             // Initialise webcam
@@ -51,6 +72,11 @@ namespace _OlympicPulse.Scripts
             }
         }
 
+        /// <summary>
+        /// Coroutine to request camera permission from the user.
+        /// Initializes the webcam if permission is granted.
+        /// </summary>
+        /// <returns>An IEnumerator for the coroutine.</returns>
         IEnumerator RequestCameraPermission()
         {
             yield return Application.RequestUserAuthorization(UserAuthorization.WebCam);
@@ -64,6 +90,10 @@ namespace _OlympicPulse.Scripts
             }
         }
 
+        /// <summary>
+        /// Handles the GUI for QR scanning.
+        /// Draws the webcam texture, scanner frame, and captures the QR code.
+        /// </summary>
         void OnGUI()
         {
             if (_camTexture == null)
@@ -140,6 +170,15 @@ namespace _OlympicPulse.Scripts
             GUI.DrawTexture(new Rect(Screen.width - offset - lineLength, Screen.height - offset_y - lineWidth, lineLength, lineWidth), texture);
             GUI.DrawTexture(new Rect(Screen.width - offset - lineWidth, Screen.height - offset_y - lineLength, lineWidth, lineLength), texture);
             
+            GUIStyle debugButtonStyle = new GUIStyle("button");
+            debugButtonStyle.fontSize = 30;
+    
+            // Place button at top right corner
+            if (GUI.Button(new Rect(Screen.width - 250, 20, 200, 80), "DEBUG SKIP", debugButtonStyle))
+            {
+                DebugSkip();
+            }
+            
             try
             {
                 IBarcodeReader barcodeReader = new BarcodeReader();
@@ -208,7 +247,40 @@ namespace _OlympicPulse.Scripts
                 Debug.LogWarning(ex.Message);
             }
         }
+        
+        /// <summary>
+        /// Debug function to skip QR scanning and proceed to the next scene.
+        /// Sets hardcoded values for event details.
+        /// </summary>
+        void DebugSkip()
+        {
+            // Hardcoded values for debug skip
+            personName = "Melissa";
+            sport = "Sprinting";
+            date = "20-12-2023";
+            time = "18:30";
 
+            // Store the hardcoded information in PlayerPrefs
+            PlayerPrefs.SetString("PersonName", personName);
+            PlayerPrefs.SetString("Sport", sport);
+            PlayerPrefs.SetString("Date", date);
+            PlayerPrefs.SetString("Time", time);
+            PlayerPrefs.SetInt("HasScannedTicket", 1);  // Set flag to indicate a ticket has been "scanned"
+
+            // Log the hardcoded information
+            Debug.Log($"Debug Skip - Name: {personName}, Sport: {sport}, Date: {date}, Time: {time}");
+
+            // Load the PersonalisedWelcome scene
+            Debug.Log("Debug Skip - Attempting to load PersonalisedWelcome scene.");
+            StartCoroutine(LoadSceneAfterDelay("PersonalisedWelcome", 1));
+        }
+
+        /// <summary>
+        /// Coroutine to load a Unity scene after a delay.
+        /// </summary>
+        /// <param name="sceneName">The name of the scene to load.</param>
+        /// <param name="delay">The time to wait before loading the scene, in seconds.</param>
+        /// <returns>An IEnumerator for the coroutine.</returns>
         IEnumerator LoadSceneAfterDelay(string sceneName, float delay)
         {
             yield return new WaitForSeconds(delay);

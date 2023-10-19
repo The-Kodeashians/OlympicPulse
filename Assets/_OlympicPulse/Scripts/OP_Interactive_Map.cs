@@ -9,19 +9,50 @@ using System;
 
 namespace _OlympicPulse.Scripts
 { 
+    /// <summary>
+    /// Manages the interactive map features in AR.
+    /// This script is attached to the InteractiveMap prefab in the Main scene.
+    /// </summary>
     public class OP_Interactive_Map : MonoBehaviour
     {
+        /// <summary>
+        /// Manages AR planes for the scene.
+        /// </summary>
         public ARPlaneManager arPlaneManager;
+        
+        /// <summary>
+        /// The object to be placed on the AR plane.
+        /// </summary>
         public GameObject objectToPlace;
-        public Button placeMapButton; // Reference to the button
-        public TextMeshProUGUI buttonText; // Reference to the button's text component
+        
+        /// <summary>
+        /// Button that toggles map placement.
+        /// </summary>
+        public Button placeMapButton;
+        
+        /// <summary>
+        /// Text displayed on the placeMapButton.
+        /// </summary>
+        public TextMeshProUGUI buttonText; 
 
-        private GameObject _currentObjectInstance; // This will store our instantiated object
+        /// <summary>
+        /// Instance of the object that is currently placed.
+        /// </summary>
+        private GameObject _currentObjectInstance;
 
-        private Vector2 _previousTouchDifference; // Stores the difference between two touch points from the previous frame
+        /// <summary>
+        /// Stores the difference between two touch points from the previous frame.
+        /// </summary>
+        private Vector2 _previousTouchDifference;
 
-        private float _previousTouchDistance; // Stores distance between two touch points from the previous frame
+        /// <summary>
+        /// Stores distance between two touch points from the previous frame.
+        /// </summary>
+        private float _previousTouchDistance;
 
+        /// <summary>
+        /// Initialization logic for setting up AR and UI elements.
+        /// </summary>
         void Start()
         {
             // Initially, set the button as invisible
@@ -31,6 +62,9 @@ namespace _OlympicPulse.Scripts
             placeMapButton.onClick.AddListener(ToggleMap);
         }
 
+        /// <summary>
+        /// Update logic for handling user interactions and object scaling.
+        /// </summary>
         void Update()
         {
             // Pinch to scale
@@ -65,11 +99,17 @@ namespace _OlympicPulse.Scripts
             }
         }
 
+        /// <summary>
+        /// Handler for the back button, returns the user to the PersonalisedWelcome scene.
+        /// </summary>
         public void OnBackButtonPress()
         {
             LoadScene("PersonalisedWelcome");
         }
         
+        /// <summary>
+        /// Toggles the map between placed and not placed.
+        /// </summary>
         public void ToggleMap()
         {
             Debug.Log("ToggleMap was called!");
@@ -105,6 +145,10 @@ namespace _OlympicPulse.Scripts
             buttonText.text = _currentObjectInstance == null ? "Place Map" : "Remove Map";
         }
         
+        /// <summary>
+        /// Event handler for when an AR plane is added.
+        /// </summary>
+        /// <param name="args">Event arguments, which include the list of added planes.</param>
         void OnPlaneAdded(ARPlanesChangedEventArgs args)
         {
             // If a plane is added, make the button visible
@@ -114,6 +158,10 @@ namespace _OlympicPulse.Scripts
             }
         }
 
+        /// <summary>
+        /// Event handler for when an AR plane is removed.
+        /// </summary>
+        /// <param name="args">Event arguments, which include the list of removed planes.</param>
         void OnPlaneRemoved(ARPlanesChangedEventArgs args)
         {
             // If all planes are removed, make the button invisible
@@ -123,6 +171,9 @@ namespace _OlympicPulse.Scripts
             }
         }
 
+        /// <summary>
+        /// Subscribes to relevant ARPlaneManager events when enabled.
+        /// </summary>
         void OnEnable()
         {
             // Subscribe to the planesChanged event
@@ -130,6 +181,9 @@ namespace _OlympicPulse.Scripts
             arPlaneManager.planesChanged += OnPlaneRemoved;
         }
 
+        /// <summary>
+        /// Unsubscribes from ARPlaneManager events when disabled.
+        /// </summary>
         void OnDisable()
         {
             // Unsubscribe from the planesChanged event
@@ -137,6 +191,10 @@ namespace _OlympicPulse.Scripts
             arPlaneManager.planesChanged -= OnPlaneRemoved;
         }
         
+        /// <summary>
+        /// Loads a specified Unity scene.
+        /// </summary>
+        /// <param name="sceneName">The name of the scene to load.</param>
         void LoadScene(string sceneName)
         {
             try

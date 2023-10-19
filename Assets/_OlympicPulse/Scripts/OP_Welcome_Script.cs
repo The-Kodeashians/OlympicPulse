@@ -6,17 +6,40 @@ using TMPro;
 
 namespace _OlympicPulse.Scripts
 {
+    /// <summary>
+    /// Manages the welcome screen, including displaying personalized messages and countdown to the event.
+    /// This script is attached to the WelcomeManager prefab in the PersonalisedWelcome scene.
+    /// </summary>
     public class OP_Welcome_Script : MonoBehaviour
     {
+        /// <summary>
+        /// TextMeshProUGUI element for displaying the welcome message.
+        /// </summary>
         public TextMeshProUGUI welcomeText;
-        //public TextMeshProUGUI eventText;
+        
+        /// <summary>
+        /// TextMeshProUGUI element for displaying the countdown to the event.
+        /// </summary>
         public TextMeshProUGUI countdownText;
-        public float fadeTime = 2f;
+        
+        /// <summary>
+        /// Start and end position of a touch event for swipe-up detection.
+        /// </summary>
         private Vector2 touchStartPos, touchEndPos;
+        
+        /// <summary>
+        /// Flag to indicate if a swipe-up has been detected.
+        /// </summary>
         private bool swipedUp = false;
 
+        /// <summary>
+        /// DateTime object to store the parsed event date and time.
+        /// </summary>
         private DateTime _eventDateTime;
 
+        /// <summary>
+        /// Initializes the script, setting up the welcome screen and user information.
+        /// </summary>
         void Start()
         {
             try
@@ -51,12 +74,19 @@ namespace _OlympicPulse.Scripts
             }
         }
 
+        /// <summary>
+        /// Handler for the main button press that transitions to the Main scene.
+        /// </summary>
         public void ToMainButtonPress()
         {
             Debug.Log("Main Button pressed");
             LoadScene("Main");
         }
 
+        /// <summary>
+        /// Coroutine that manages the countdown to the event.
+        /// </summary>
+        /// <returns>An IEnumerator for the coroutine.</returns>
         IEnumerator CountdownToEvent()
         {
             while (true)
@@ -74,6 +104,10 @@ namespace _OlympicPulse.Scripts
             }
         }
         
+        /// <summary>
+        /// Loads a specified Unity scene.
+        /// </summary>
+        /// <param name="sceneName">The name of the scene to load.</param>
         void LoadScene(string sceneName)
         {
             try
