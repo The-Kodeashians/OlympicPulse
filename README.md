@@ -1,5 +1,9 @@
-# OlympicPulse
-An AR app for mobile targeting amateur athletes visiting the Olympics, offering an immersive experience with an interactive AR stadium and and AR games.
+# ![OlympicPulse](https://github.com/The-Kodeashians/OlympicPulse/assets/22523084/3d798d59-847a-4fd5-bd38-3f3b73107257)
+An AR app for mobile targeting amateur athletes visiting the Olympics, offering an immersive experience with an interactive AR stadium and and AR games. This app was developed for capstone UQ Course [DECO3801](https://my.uq.edu.au/programs-courses/course.html?course_code=DECO3801).
+
+
+![image](https://github.com/The-Kodeashians/OlympicPulse/assets/22523084/d3d27246-c981-4fd9-be48-5afb7fe9cadb)
+![OlympicPulse Kickstarter Video](https://www.youtube.com/watch?v=8Sh9KiPCjKw)
 
 ### Objective
 OlympicPulse aims to create an engaging and continuous experience for Olympic ticket holders, with a special focus on amateur athletes who aspire to compete against the best. The app offers a seamless journey from the moment the ticket is purchased to the day of the event. Through a blend of gamification, daily quests, and a streak reward system, users are encouraged to interact with the app regularly. A token system also rewards user engagement, allowing them to purchase exclusive athletes and skins, thereby personalising their Olympic experience.
